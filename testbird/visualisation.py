@@ -12,11 +12,10 @@ import cartopy.crs as ccrs
 LOGGER = logging.getLogger("PYWPS")
 
 
-def plot_area(coords=(-75,43), extra = 30):
+def plot_area(coords=(-75.0,43.0)):
     """
     return a map plot centered on a particular spot
     :param coords: tuple (lon,lat) of central location
-    :param extra: degrees extra plotted
     :return: matplotlib object
     """
     central_lon = coords[0]
@@ -31,6 +30,8 @@ def plot_area(coords=(-75,43), extra = 30):
     ax.coastlines()
     ax.gridlines()
     ax.stock_img()
+
+    plt.plot(central_lon, central_lat, marker='x', color='red')
 
     return fig
 
