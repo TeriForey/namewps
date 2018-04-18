@@ -1,0 +1,12 @@
+version: '3'
+services:
+  testbird:
+    buildout: .
+    image: birdhouse/testbird
+    environment:
+      HOSTNAME: $HOSTNAME
+      HTTP_PORT: $HTTP_PORT
+      OUTPUT_PORT: $OUTPUT_PORT
+    ports:
+      - "$HTTP_PORT:$HTTP_PORT"
+      - "$OUTPUT_PORT:$OUTPUT_PORT"
