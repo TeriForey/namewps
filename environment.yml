@@ -1,35 +1,153 @@
-name: testbird
+name: base
 channels:
-- birdhouse
-- conda-forge
-- defaults
+  - defaults
+  - birdhouse
+  - conda-forge
 dependencies:
-- python=2.7
-- pyopenssl=0.16
-- cryptography=1.4
-- pyyaml=3.11
-- curl=7.45.0
-- icu=58
-# buildout
-- mako
-# tests
-- pytest
-# pep8
-- flake8
-- pycodestyle
-# docs
-- sphinx
-- six
-- doc8
-# wps
-- pywps=4.0.0
-- click=6
-- nginx=1.10.3
-- supervisor=3.3
-- gunicorn=19.7
-- lxml=3.7
-- libxslt=1.1.29
-- genshi=0.7
-- pip:
-  - sphinx-autoapi==0.5.0
-  - -e git+https://github.com/huard/sphinx-autodoc-pywps.git#egg=sphinx_autodoc_pywps
+  - owslib=0.16.0=pyh682d81c_52
+  - pywps=4.0.0=py27h7bd8643_36
+  - alabaster=0.7.10=py27_1
+  - attrs=17.4.0=py_0
+  - babel=2.5.3=py27_0
+  - cffi=1.11.5=py27_0
+  - chardet=3.0.4=py27_0
+  - click=6.7=py_1
+  - configparser=3.5.0=py27_0
+  - dill=0.2.7.1=py27_0
+  - doc8=0.8.0=py27_0
+  - docutils=0.14=py27_0
+  - drmaa=0.7.8=py_0
+  - enum34=1.1.6=py27_1
+  - expat=2.2.5=0
+  - flake8=3.5.0=py27_0
+  - flufl.enum=4.1.1=py27_0
+  - freexl=1.0.5=0
+  - funcsigs=1.0.2=py_2
+  - functools32=3.2.3.2=py27_2
+  - gdal=2.1.4=py27_2
+  - genshi=0.7=py27_0
+  - geos=3.6.2=1
+  - geotiff=1.4.2=1
+  - giflib=5.1.4=0
+  - gunicorn=19.7.1=py27_0
+  - hdf4=4.2.13=0
+  - hdf5=1.10.1=2
+  - icu=58.2=0
+  - idna=2.6=py27_1
+  - imagesize=1.0.0=py27_0
+  - ipaddress=1.0.18=py27_0
+  - jinja2=2.10=py27_0
+  - jpeg=9b=2
+  - json-c=0.12.1=0
+  - jsonschema=2.6.0=py27_1
+  - kealib=1.4.7=4
+  - libdap4=3.18.3=2
+  - libffi=3.2.1=3
+  - libgdal=2.1.4=9
+  - libiconv=1.15=0
+  - libmagic=5.32=0
+  - libpng=1.6.34=0
+  - libpq=9.6.3=0
+  - libspatialite=4.3.0a=19
+  - libtiff=4.0.9=0
+  - libxml2=2.9.8=0
+  - libxslt=1.1.29=5
+  - lxml=3.7.3=py27_0
+  - mako=1.0.7=py27_0
+  - markupsafe=1.0=py27_0
+  - mccabe=0.6.1=py27_0
+  - mkl_fft=1.0.1=py27_1
+  - mkl_random=1.0.1=py27_0
+  - more-itertools=4.1.0=py_0
+  - ncurses=5.9=10
+  - openjpeg=2.1.2=2
+  - packaging=17.1=py_0
+  - pbr=4.0.2=py_0
+  - pcre=8.39=0
+  - pip=9.0.3=py27_0
+  - pluggy=0.6.0=py_0
+  - proj4=4.9.3=5
+  - psycopg2=2.7.4=py27_0
+  - py=1.5.3=py_0
+  - pyasn1=0.4.2=py_0
+  - pycodestyle=2.3.1=py27_0
+  - pycparser=2.18=py27_0
+  - pyflakes=1.6.0=py27_0
+  - pygments=2.2.0=py27_0
+  - pyparsing=2.2.0=py27_0
+  - pyproj=1.9.5.1=py27_0
+  - pysocks=1.6.8=py27_1
+  - pytest=3.5.0=py27_0
+  - python=2.7.14=5
+  - python-dateutil=2.7.2=py_0
+  - python-magic=0.4.15=py27_0
+  - pytz=2018.4=py_0
+  - pyyaml=3.11=py27_0
+  - readline=7.0=0
+  - restructuredtext_lint=1.1.3=py_0
+  - six=1.11.0=py27_1
+  - snowballstemmer=1.2.1=py27_0
+  - sphinx=1.7.2=py27_0
+  - sphinxcontrib-websupport=1.0.1=py27_0
+  - sqlalchemy=1.2.6=py27_0
+  - sqlite=3.20.1=2
+  - stevedore=1.28.0=py_0
+  - supervisor=3.3.4=py27_1
+  - tk=8.6.7=0
+  - typing=3.6.4=py27_0
+  - urllib3=1.22=py27_0
+  - werkzeug=0.14.1=py_0
+  - wheel=0.31.0=py27_0
+  - xerces-c=3.2.0=0
+  - xz=5.2.3=0
+  - yaml=0.1.7=0
+  - zlib=1.2.11=0
+  - backports=1.0=py27hb4f9756_1
+  - backports.functools_lru_cache=1.5=py27_1
+  - backports_abc=0.5=py27h6972548_0
+  - ca-certificates=2018.03.07=0
+  - cartopy=0.16.0=py27he7b4726_0
+  - certifi=2018.1.18=py27_0
+  - conda=4.4.11=py27_0
+  - conda-env=2.6.0=h36134e3_0
+  - cryptography=1.4=py27_0
+  - curl=7.45.0=0
+  - cycler=0.10.0=py27hfc73c78_0
+  - distribute=0.6.45=py27_1
+  - freetype=2.8=h12048fb_1
+  - futures=3.2.0=py27h1b80678_0
+  - intel-openmp=2018.0.0=8
+  - kiwisolver=1.0.1=py27h9856860_0
+  - libcxx=4.0.1=h579ed51_0
+  - libcxxabi=4.0.1=hebd6815_0
+  - libgfortran=3.0.1=h93005f0_2
+  - libnetcdf=4.4.1.1=hdf03fd4_8
+  - matplotlib=2.2.2=py27ha7267d0_0
+  - meld3=1.0.2=py27_0
+  - mkl=2018.0.2=1
+  - nginx=1.10.3=0
+  - numpy=1.14.2=py27ha9ae307_1
+  - olefile=0.45.1=py27_0
+  - openssl=1.0.2o=h26aff7b_0
+  - pillow=5.1.0=py27hfcce615_0
+  - pycosat=0.6.3=py27h6c51c7e_0
+  - pyepsg=0.3.2=py27h8dea652_0
+  - pyopenssl=16.2.0=py27_0
+  - pyshp=1.2.12=py27h8e4f1be_0
+  - requests=2.18.4=py27h9b2b37c_1
+  - ruamel_yaml=0.15.35=py27h1de35cc_1
+  - scipy=1.0.1=py27hcaad992_0
+  - setuptools=36.5.0=py27h2a45cec_0
+  - shapely=1.6.4=py27h2e8a847_0
+  - singledispatch=3.4.0.3=py27he22c18d_0
+  - subprocess32=3.2.7=py27h24b2887_0
+  - tornado=5.0.1=py27_1
+  - pip:
+    - pydocstyle==2.1.1
+    - sphinx-autoapi==0.5.0
+    - sphinx-autodoc-pywps==0.1
+    - sphinxcontrib-dotnetdomain==0.4
+    - sphinxcontrib-golangdomain==0.2.0.dev0
+    - unidecode==1.0.22
+prefix: /anaconda/envs/testbird
+
