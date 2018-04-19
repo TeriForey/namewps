@@ -1,6 +1,7 @@
 from pywps import Process
 from pywps import ComplexInput, ComplexOutput, Format
 from pywps import LiteralInput, LiteralOutput
+from pywps.exceptions import InvalidParameterValue
 from pywps.app.Common import Metadata
 
 
@@ -45,7 +46,8 @@ class RunNAME(Process):
                          abstract='choose whether to measure time in hours or days',
                          allowed_values = ['days','hours'], default='days'),
             LiteralInput('elevationOut', 'Elevation averaging ranges', data_type='string',
-                         abstract='Min and Max elevations where the particle number is counted',
+                         abstract='Elevation range where the particle number is counted (m agl)'
+                                  " Example: 0-100",
                          max_occurs=4), # I want ranges, so going to use string format then process the results.
             LiteralInput('resolution','Resolution', data_type='float',
                          abstract='degrees, note the UM global Met data was only 17Km resolution',
@@ -84,9 +86,26 @@ class RunNAME(Process):
 
     def _handler(self, request, response):
 
+        # Need to process the elevationOut inputs from a list of strings, into an array of tuples.
+        ranges = []
+        for elevationrange in request.inputs['elevationOut']:
+            if '-' in elevationrange.data:
+                minrange, maxrange = elevationrange.data.split('-')
+                ranges.append((int(minrange), int(maxrange))) # need to error catch int() and min < max
+            else:
+                raise InvalidParameterValue(
+                    'The value "{}" does not contain a "-" character to define a range, '
+                    'e.g. 0-100'.format(elevationrange.data))
+
+
+        # Might want to change the elevation input to something similar to this as well so we don't have three separate params
+
         params = []
         for p in request.inputs:
-            params.append([p, request.inputs[p][0].data])
+            if p == 'elevationOut':
+                params.append([p, ranges])
+            else:
+                params.append([p, request.inputs[p][0].data])
 
         with open('out.txt', 'w') as fout:
             fout.write(str(params))
