@@ -21,9 +21,12 @@ class MakeMap(Process):
     """
     def __init__(self):
         inputs = [
-            LiteralInput('lon','Integer', data_type='integer',
+            LiteralInput('longitude','Longitude', data_type='float',
                          abstract="Longitude to center on",
-                         default=-75)
+                         default=-75.0),
+            LiteralInput('latitude', 'Latitude', data_type='float',
+                         abstract="Latitude to center on",
+                         default=43.0)
             ]
         outputs = [
             ComplexOutput('output_figure', 'map',
@@ -54,10 +57,12 @@ class MakeMap(Process):
 
     def _handler(self, request, response):
 
-        longitude = request.inputs['lon']
+        longitude = request.inputs['longitude'][0].data
+        LOGGER.error(longitude, type(longitude))
+        latitude = request.inputs['latitude'][0].data
 
         try:
-            fig = plot_area()
+            fig = plot_area((longitude,latitude))
             output = fig2plot(fig, 'svg')
 
         except Exception as e:
