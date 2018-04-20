@@ -4,6 +4,7 @@ from pywps import LiteralInput, LiteralOutput
 from pywps.exceptions import InvalidParameterValue
 from pywps.app.Common import Metadata
 
+from testbird.write_inputfile import generate_inputfile
 
 import logging
 LOGGER = logging.getLogger("PYWPS")
@@ -56,7 +57,8 @@ class RunNAME(Process):
                          abstract='how often the prog will run?',
                          allowed_values=['3-hourly','daily']),
             LiteralInput('dailytime','daily run time', data_type='time',
-                         abstract='if running daily, at what time will it run'),
+                         abstract='if running daily, at what time will it run',
+                         min_occurs = 0),
             LiteralInput('startdate', 'Start date of runs', data_type='date',
                          abstract='start date of runs'),
             LiteralInput('enddate', 'End date of runs', data_type='date',
@@ -97,18 +99,17 @@ class RunNAME(Process):
                     'The value "{}" does not contain a "-" character to define a range, '
                     'e.g. 0-100'.format(elevationrange.data))
 
-
         # Might want to change the elevation input to something similar to this as well so we don't have three separate params
 
-        params = []
+        params = dict()
         for p in request.inputs:
             if p == 'elevationOut':
-                params.append([p, ranges])
+                params[p] = ranges
             else:
-                params.append([p, request.inputs[p][0].data])
+                params[p] = request.inputs[p][0].data
 
         with open('out.txt', 'w') as fout:
-            fout.write(str(params))
+            fout.write(generate_inputfile(params))
             response.outputs['output'].file = fout.name
         response.update_status("done", 100)
         return response
