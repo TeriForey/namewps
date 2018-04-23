@@ -1,24 +1,69 @@
 # encoding: utf8
-import os
-from os.path import join
+
 import logging
 import datetime as dt
 
 LOGGER = logging.getLogger("PYWPS")
 
 
-def generate_hourlys(params):
+def generate_hourlys(params, index, cur_date, start_hour, stop_hour):
     """
     This will add the SourceTermAndOutputRequest_Template text into the file for each hour it needs to be run.
-    :param params:
+    :param params: input parameters
+    :param index: sample index number
+    :param cur_date: current datetime object
+    :param start_hour: starting hour
+    :param stop_hour: stopping hour
     :return:
     """
 
-    pass
+    SamplingPeriod_Stop = cur_date + dt.timedelta(hours=stop_hour)
+    SamplingPeriod_Start = cur_date + dt.timedelta(hours=start_hour)
+
+    strings = []
+
+    strings.append("""
+! Source term and output requests for sampling period {}: {} --> {}""".format(
+        index, dt.datetime.strftime(SamplingPeriod_Start, '%d/%m/%Y %H:%M'),
+        dt.datetime.strftime(SamplingPeriod_Stop, '%d/%m/%Y %H:%M')))
+
+    Z = params['elevation']
+    dZ = 10.0
+    if 'elevation_range_min' in params:
+        dZ = params['elevation_range_max'] - params['elevation_range_min']
+        Z = params['elevation_range_min'] + dZ/2
+
+
+    strings.append("""
+Sources:
+Name,           Start Time,          Stop Time,           # Particles,      Source Strength,   Shape,  H-Coord, Z-Coord,       Set of Locations, Location, dH-Metres?, dZ-Metres?,     Z,   dX,   dY,    dZ, Angle, Top Hat, Plume Rise?, Temperature, Volume Flow Rate,  Max Age
+SourceID1_{}, {}, {}, {}, TRACER1 1.0 g/s,  Cuboid, Lat-Long,   m agl,  Receptor Locations, {},        No,        Yes,  {},  2.5,  2.5, {},   0.0,     Yes,          No,         273.0,              0.0, infinity""".format(
+        index,
+        dt.datetime.strftime(SamplingPeriod_Start, '%d/%m/%Y %H:%M'),
+        dt.datetime.strftime(SamplingPeriod_Stop, '%d/%m/%Y %H:%M'),
+        params['npart'],
+        params['title'],
+        Z, # Z
+        dZ, # dZ
+        ))
+
+    strings.append("""
+Output Requirements - Fields: 
+Name,                             Quantity,      Species,                  Source, H-Grid, Z-Grid,        T-Grid, BL Average, T Av Or Int,          Av Time,  # Av Times, Sync?, Output Route, Across,  Separate File, Output Format, Output Group""")
+
+    nzgrids = 0
+    for minele, maxele in params['elevationOut']:
+        nzgrids += 1
+        strings.append("Req1_{}, Air concentration, TRACER1, SourceID1_{}, HGrid1, ZGrid{}, TGrid{},         No,"
+                       "         Int, {}:00, {},    No,            D,     TZ,  Z,          IA, group{}".format(
+            index,index, nzgrids, index, params['runDuration'], params['runDuration']*params['ntimesperhour'], nzgrids))
+
+
+    return "\n".join(strings)+"\n"
 
 
 
-def generate_coords(params):
+def generate_coords(params, cur_date):
 
     ## Taken from original script
 
@@ -57,10 +102,12 @@ HGrid1, Lat-Long,     {},     {},     {},     {},     {},     {},
 Vertical Grids:
 Name,   Z-Coord,  nZ,      Z0,      dZ,""")
 
+    nzgrids = 0
     for minele, maxele in params['elevationOut']:
+        nzgrids += 1
         dZ = maxele - minele
         Z0 = minele + (dZ/2)
-        coordsstrings.append("ZGrid1,   m agl,   1,    {},   {},".format(Z0, dZ))
+        coordsstrings.append("ZGrid{},   m agl,   1,    {},   {},".format(nzgrids, Z0, dZ))
 
     if params['timeFmt'] == "days":
         maxagehours = params['time']*24
@@ -69,25 +116,38 @@ Name,   Z-Coord,  nZ,      Z0,      dZ,""")
 
     if params['timestamp'] == '3-hourly':
         runDuration = maxagehours + 3
+        params['runDuration'] = runDuration
         coordsstrings.append("""
 Temporal Grids:
-Name,                      nt,     dt,               t0,
-TGrid1,              1,  03:00,   %EndTimeOfRun%,
-TGrid2,              1,  03:00,   %EndTimeOfRun2%,
-TGrid3,              1,  03:00,   %EndTimeOfRun3%,
-TGrid4,              1,  03:00,   %EndTimeOfRun4%,
-TGrid5,              1,  03:00,   %EndTimeOfRun5%,
-TGrid6,              1,  03:00,   %EndTimeOfRun6%,
-TGrid7,              1,  03:00,   %EndTimeOfRun7%,
-TGrid8,              1,  03:00,   %EndTimeOfRun8%,
-""")
+Name,                      nt,     dt,               t0,""")
+        if params['runBackwards']:
+            for i in range(1,9):
+                coordsstrings.append("TGrid{},              1,  03:00,   {},".format(i,
+                                                                                     dt.datetime.strftime(
+                                                                                         cur_date - dt.timedelta(
+                                                                                             days=params['time']),
+                                                                                         '%d/%m/%Y %H:%M')
+                                                                                     ))
+                cur_date = cur_date + dt.timedelta(hours=3)
+        else:
+            for i in range(1,9):
+                cur_date = cur_date + dt.timedelta(hours=3)
+                coordsstrings.append("TGrid{},              1,  03:00,   {},".format(i,
+                                                                                     dt.datetime.strftime(
+                                                                                         cur_date + dt.timedelta(
+                                                                                             days=params['time']),
+                                                                                         '%d/%m/%Y %H:%M')
+                                                                                     ))
+
+
     else:
         runDuration = maxagehours + 24
+        params['runDuration'] = runDuration
         coordsstrings.append("""
 Temporal Grids:
 Name,                      nt,     dt,               t0,
-TGrid1,              1,  24:00,   %EndTimeOfRun%,
-""")
+TGrid1,              1,  24:00,   {},
+""".format(dt.datetime.strftime(cur_date - dt.timedelta(days=params['time']), '%d/%m/%Y %H:%M')))
 
     coordsstrings.append("""
 Domains:
@@ -117,6 +177,15 @@ def generate_inputfile(params):
     # This will need editing, will need loggedin username, and a run id sub dir.
     workdir = "/group_workspaces/jasmin/name/cache/users/mpanagi/back_traj_lotus/v7_2/test/Back_daily_{}".format(params['title'])
 
+    cur_date = dt.datetime.combine(params['startdate'], dt.time(0))
+
+    params['npart'] = ParticlesPerSource
+    params['ntimesperhour'] = nIntTimesPerHour
+
+    backwards = "No"
+    if params['runBackwards']:
+        backwards = "Yes"
+
     header = """
   ******************************************************************************
 !
@@ -131,7 +200,7 @@ def generate_inputfile(params):
 
 Main Options:
 Absolute or Relative Time?, Fixed Met?, Flat Earth?,    Run Name,       Random Seed, Max # Sources, Backwards?
-                  Absolute,         No,          No,          {},             Fixed,            24,        Yes
+                  Absolute,         No,          No,          {},             Fixed,            24,        {}
 
 Restart File Options:
 # Cases Between Writes, Time Between Writes, Delete Old Files?, Write On Suspend?,
@@ -144,7 +213,7 @@ Dispersion Options Ensemble Size, Met Ensemble Size,
 OpenMP Options:
 Use OpenMP?,    Threads, Parallel MetRead, Parallel MetProcess,
          No,         {},               No,                  No,
-""".format(dt.datetime.now(), params['title'], nthreads)
+""".format(dt.datetime.now(), params['title'], backwards, nthreads)
 
     inandout = """
 Output Options:
@@ -156,7 +225,7 @@ File names
 %MetDefnFile%
 """.format(workdir)
 
-    coordstr = generate_coords(params)
+    coordstr = generate_coords(params, cur_date)
 
     footer = """
 Species:
@@ -179,12 +248,13 @@ Max # Particles,   Max # Full Particles, Skew Time, Velocity Memory Time, Mesosc
     while(hour_stop < 24):
         samplingPeriodIndex += 1
 
-        # Need to find out what format the time needs to be in. date -d seems to control the daylight savings time??
-
-        # Will run function here
+        if params['runBackwards']:
+            hourstrings.append(generate_hourlys(params, samplingPeriodIndex, cur_date, hour_start, hour_stop))
+        else:
+            hourstrings.append(generate_hourlys(params, samplingPeriodIndex, cur_date, hour_stop, hour_start))
 
         hour_stop = hour_stop + SamplingPeriod_Hours
         hour_start = hour_start + SamplingPeriod_Hours
 
-    return header+inandout+coordstr+footer
+    return header+inandout+coordstr+footer+"\n".join(hourstrings)
 
