@@ -31,7 +31,7 @@ def generate_hourlys(params, index, cur_date, start_hour, stop_hour):
         dt.datetime.strftime(SamplingPeriod_Stop, '%d/%m/%Y %H:%M')))
 
     Z = params['elevation']
-    dZ = 10.0
+    dZ = 0.0
     if 'elevation_range_min' in params:
         dZ = params['elevation_range_max'] - params['elevation_range_min']
         Z = params['elevation_range_min'] + dZ/2

@@ -31,7 +31,7 @@ class RunNAME(Process):
                          default='-120.0,80.0,-30.0,90.0', min_occurs=0),
             LiteralInput('elevation','Elevation', data_type='integer',
                          abstract = "m agl for land, m asl for marine release",
-                         default=100, min_occurs=0),
+                         default=10, min_occurs=0),
             LiteralInput('elevation_range_min','Elevation Range Min', data_type='integer',
                          abstract="Minimum range of elevation",
                          default=None, min_occurs=0),
@@ -52,7 +52,7 @@ class RunNAME(Process):
             LiteralInput('elevationOut', 'Elevation averaging ranges', data_type='string',
                          abstract='Elevation range where the particle number is counted (m agl)'
                                   " Example: 0-100",
-                         max_occurs=4), # I want ranges, so going to use string format then process the results.
+                         default='0-100', min_occurs=1, max_occurs=4), # I want ranges, so going to use string format then process the results.
             LiteralInput('resolution','Resolution', data_type='float',
                          abstract='degrees, note the UM global Met data was only 17Km resolution',
                          allowed_values=[0.05,0.25], default=0.25, min_occurs=0),
@@ -102,6 +102,7 @@ class RunNAME(Process):
                     'The value "{}" does not contain a "-" character to define a range, '
                     'e.g. 0-100'.format(elevationrange.data))
 
+        # Process the string of domains into a list of floats.
         domains = []
         if ',' not in request.inputs['domain'][0].data:
             raise InvalidParameterValue("The domain coordinates must be split using a ','")
