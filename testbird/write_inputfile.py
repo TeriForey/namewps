@@ -1,7 +1,10 @@
 # encoding: utf8
 
+import os
+import re
 import logging
 import datetime as dt
+from .utils import get_Mk_global, get_Met_vals
 
 LOGGER = logging.getLogger("PYWPS")
 
@@ -177,7 +180,26 @@ def generate_inputfile(params):
     # This will need editing, will need loggedin username, and a run id sub dir.
     workdir = "/group_workspaces/jasmin/name/cache/users/mpanagi/back_traj_lotus/v7_2/test/Back_daily_{}".format(params['title'])
 
+    utilsdir = "/Users/teriforey/Documents/NAME-on-JASMIN/CommonUtilities"
+    namedir = "/group_workspaces/jasmin/name/code/NAMEIII_v7_2_lotus"
+    topodir = "/group_workspaces/jasmin/name/code/NAMEIII_v7_2_lotus/Resources/Topog"
+    metdir = os.getcwd() + "/met_data"
+
     cur_date = dt.datetime.combine(params['startdate'], dt.time(0))
+
+    start_globalMk = get_Mk_global(cur_date + dt.timedelta(days=1))
+    end_globalMK = get_Mk_global(cur_date - dt.timedelta(days=params['time']))
+
+    if start_globalMk == 0 or end_globalMK == 0:
+        raise Exception("Date is before the earliest available Global met data")
+    elif start_globalMk != end_globalMK:
+        raise Exception("The start and stop dates of the NAME run do not use the same 'Mk' Global met data")
+
+    MetVals = get_Met_vals(start_globalMk)
+
+    MetDefnFile = namedir + "/Resources/Defns/" + MetVals['MetDefnFileName']
+    MetDeclnFile = utilsdir + "/MetDeclarations/" + MetVals['MetDeclFileName']
+    MetRestoreScript = utilsdir + "/MetRestore_JASMIN.ksh"
 
     params['npart'] = ParticlesPerSource
     params['ntimesperhour'] = nIntTimesPerHour
@@ -222,8 +244,8 @@ Folder
 
 Input Files:
 File names
-%MetDefnFile%
-""".format(workdir)
+{}
+""".format(workdir, MetDefnFile)
 
     coordstr = generate_coords(params, cur_date)
 
@@ -256,5 +278,18 @@ Max # Particles,   Max # Full Particles, Skew Time, Velocity Memory Time, Mesosc
         hour_stop = hour_stop + SamplingPeriod_Hours
         hour_start = hour_start + SamplingPeriod_Hours
 
-    return header+inandout+coordstr+footer+"\n".join(hourstrings)
+
+    if not os.path.exists(MetDeclnFile):
+        raise Exception("Cannot find Met Declaration file {}".format(MetDeclnFile))
+
+    declstrings = []
+    with open(MetDeclnFile, 'r') as ins:
+        for l in ins:
+            l = l.rstrip()
+            l = re.sub("%MetDir%", metdir, l)
+            l = re.sub("%TopogDir%", topodir, l)
+            l = re.sub("%MetRestoreScript%", MetRestoreScript, l)
+            declstrings.append(l)
+
+    return header+inandout+coordstr+footer+"\n".join(hourstrings)+"\n\n"+"\n".join(declstrings)
 
