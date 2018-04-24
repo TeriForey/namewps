@@ -1,6 +1,6 @@
 from pywps import Process
 from pywps import ComplexInput, ComplexOutput, Format
-from pywps import LiteralInput, LiteralOutput
+from pywps import LiteralInput, LiteralOutput, BoundingBoxInput
 from pywps.exceptions import InvalidParameterValue
 from pywps.app.Common import Metadata
 
@@ -22,10 +22,13 @@ class RunNAME(Process):
         inputs = [
             LiteralInput('latitude', 'Latitude', data_type='float',
                          abstract="Location of release",
-                         default=43.0),
+                         default=-24.867222),
             LiteralInput('longitude','Longitude', data_type='float',
                          abstract="Location of release",
-                         default=-75.0),
+                         default=16.863611),
+            LiteralInput('domain', 'Domain coordinates', data_type='string',
+                         abstract='Coordinates to seach within (minX,maxX,minY,maxY)',
+                         default='-120.0,80.0,-30.0,90.0', min_occurs=0),
             LiteralInput('elevation','Elevation', data_type='integer',
                          abstract = "m agl for land, m asl for marine release",
                          default=100, min_occurs=0),
@@ -99,12 +102,22 @@ class RunNAME(Process):
                     'The value "{}" does not contain a "-" character to define a range, '
                     'e.g. 0-100'.format(elevationrange.data))
 
+        domains = []
+        if ',' not in request.inputs['domain'][0].data:
+            raise InvalidParameterValue("The domain coordinates must be split using a ','")
+        for val in request.inputs['domain'][0].data.split(','):
+            domains.append(float(val))
+        if len(domains) != 4:
+            raise InvalidParameterValue("There must be four coordinates entered, minX,maxX,minY,maxY")
+
         # Might want to change the elevation input to something similar to this as well so we don't have three separate params
 
         params = dict()
         for p in request.inputs:
             if p == 'elevationOut':
                 params[p] = ranges
+            elif p == 'domain':
+                params[p] = domains
             else:
                 params[p] = request.inputs[p][0].data
 

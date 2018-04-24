@@ -68,12 +68,10 @@ Name,                             Quantity,      Species,                  Sourc
 
 def generate_coords(params, cur_date):
 
-    ## Taken from original script
-
-    CompDom_Xmin = -120.0
-    CompDom_Xmax = 80.0
-    CompDom_Ymin = -30.0
-    CompDom_Ymax = 90.0
+    CompDom_Xmin = params['domain'][0]
+    CompDom_Xmax = params['domain'][1]
+    CompDom_Ymin = params['domain'][2]
+    CompDom_Ymax = params['domain'][3]
 
     coordsstrings = []
 
@@ -175,7 +173,10 @@ def generate_inputfile(params):
     MaxNumParticles = 1000000
     SyncTime_Minutes = 15
     nIntTimesPerHour = 4
-    SamplingPeriod_Hours = 3 # Is this specific to running it 3-hourly??
+    if params['timestamp'] == '3-hourly':
+        SamplingPeriod_Hours = 3 # Is this specific to running it 3-hourly??
+    else:
+        SamplingPeriod_Hours = 24
 
     # This will need editing, will need loggedin username, and a run id sub dir.
     workdir = "/group_workspaces/jasmin/name/cache/users/mpanagi/back_traj_lotus/v7_2/test/Back_daily_{}".format(params['title'])
@@ -186,6 +187,8 @@ def generate_inputfile(params):
     metdir = os.getcwd() + "/met_data"
 
     cur_date = dt.datetime.combine(params['startdate'], dt.time(0))
+    if 'dailytime' in params and params['timestamp'] == 'daily':
+        cur_date = dt.datetime.combine(cur_date, params['dailytime'])
 
     start_globalMk = get_Mk_global(cur_date + dt.timedelta(days=1))
     end_globalMK = get_Mk_global(cur_date - dt.timedelta(days=params['time']))
