@@ -54,11 +54,10 @@ SourceID1_{}, {}, {}, {}, TRACER1 1.0 g/s,  Cuboid, Lat-Long,   m agl,  Receptor
 Output Requirements - Fields: 
 Name,                             Quantity,      Species,                  Source, H-Grid, Z-Grid,        T-Grid, BL Average, T Av Or Int,          Av Time,  # Av Times, Sync?, Output Route, Across,  Separate File, Output Format, Output Group""")
 
-    nzgrids = 0
-    for minele, maxele in params['elevationOut']:
-        nzgrids += 1
-        strings.append("Req1_{}, Air concentration, TRACER1, SourceID1_{}, HGrid1, ZGrid{}, TGrid{},         No,"
-                       "         Int, {}:00, {},    No,            D,     TZ,  Z,          IA, group{}".format(
+
+    for nzgrids in range(1, len(params['elevationOut']) + 1):
+        strings.append("Req{}_{}, Air concentration, TRACER1, SourceID1_{}, HGrid1, ZGrid{}, TGrid{},         No,"
+                       "         Int, {}:00, {},    No,            D,     TZ,  Z,          IA, group{}".format(nzgrids,
             index,index, nzgrids, index, params['runDuration'], params['runDuration']*params['ntimesperhour'], nzgrids))
 
 

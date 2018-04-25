@@ -5,6 +5,7 @@ from pywps.exceptions import InvalidParameterValue
 from pywps.app.Common import Metadata
 
 from testbird.write_inputfile import generate_inputfile
+from testbird.write_scriptfile import write_file
 from testbird.utils import daterange
 
 import logging
@@ -133,11 +134,13 @@ class RunNAME(Process):
             with open('out.txt', 'w') as fout:
                 fout.write(generate_inputfile(params, cur_date))
                 response.outputs['NAMEinput'].file = fout.name
+
+            with open('out2.txt', 'w') as fout:
+                fout.write(write_file(params, cur_date))
+                response.outputs['NAMEscript'].file = fout.name
+
             break # For testing, only run this on one day
 
-        with open('out2.txt', 'w') as fout:
-            fout.write("This is a bash script\n")
-            response.outputs['NAMEscript'].file = fout.name
 
         response.update_status("done", 100)
         return response
