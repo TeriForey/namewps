@@ -1,4 +1,4 @@
-name: testbird
+name: babybird
 channels:
 - birdhouse
 - conda-forge
