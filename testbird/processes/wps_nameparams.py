@@ -5,6 +5,7 @@ from pywps.exceptions import InvalidParameterValue
 from pywps.app.Common import Metadata
 
 from testbird.write_inputfile import generate_inputfile
+from testbird.utils import daterange
 
 import logging
 LOGGER = logging.getLogger("PYWPS")
@@ -68,8 +69,13 @@ class RunNAME(Process):
                          abstract = 'end date of runs'),
             ]
         outputs = [
-            ComplexOutput('output', 'params',
-                          abstract="Input parameters in JSON format",
+            ComplexOutput('NAMEinput', 'Input file for running NAME',
+                          abstract="Input parameters in correct format",
+                          as_reference=True,
+                          supported_formats=[Format('text/plain')],
+                          ),
+            ComplexOutput('NAMEscript', 'Script file for running NAME',
+                          abstract="Bash script for running NAME",
                           as_reference=True,
                           supported_formats=[Format('text/plain')],
                           ),
@@ -122,8 +128,16 @@ class RunNAME(Process):
             else:
                 params[p] = request.inputs[p][0].data
 
-        with open('out.txt', 'w') as fout:
-            fout.write(generate_inputfile(params))
-            response.outputs['output'].file = fout.name
+        # Will loop through all the dates in range, note need to add one day to the enddate
+        for cur_date in daterange(request.inputs['startdate'][0].data, request.inputs['enddate'][0].data):
+            with open('out.txt', 'w') as fout:
+                fout.write(generate_inputfile(params, cur_date))
+                response.outputs['NAMEinput'].file = fout.name
+            break # For testing, only run this on one day
+
+        with open('out2.txt', 'w') as fout:
+            fout.write("This is a bash script\n")
+            response.outputs['NAMEscript'].file = fout.name
+
         response.update_status("done", 100)
         return response

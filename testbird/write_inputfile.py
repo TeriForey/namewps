@@ -160,7 +160,7 @@ Dispersion Domain,           No, Lat-Long,    {},   {},   {},   {},           No
     return "\n".join(coordsstrings)
 
 
-def generate_inputfile(params):
+def generate_inputfile(params, rundate):
 
     """
     This will take the input parameters and generate the appropriate file for running NAME
@@ -178,15 +178,22 @@ def generate_inputfile(params):
     else:
         SamplingPeriod_Hours = 24
 
+    backwards = "No"
+    runtype = "FWD"
+    if params['runBackwards']:
+        backwards = "Yes"
+        runtype= "BCK"
+
     # This will need editing, will need loggedin username, and a run id sub dir.
-    workdir = "/group_workspaces/jasmin/name/cache/users/mpanagi/back_traj_lotus/v7_2/test/Back_daily_{}".format(params['title'])
+    workdir = "/group_workspaces/jasmin/name/cache/users/tforey/WPStest/{}_{}_{}".format(runtype, params['timestamp'], params['title'])
 
     utilsdir = "/Users/teriforey/Documents/NAME-on-JASMIN/CommonUtilities"
     namedir = "/group_workspaces/jasmin/name/code/NAMEIII_v7_2_lotus"
     topodir = "/group_workspaces/jasmin/name/code/NAMEIII_v7_2_lotus/Resources/Topog"
-    metdir = os.getcwd() + "/met_data"
+    metdir = workdir + "/met_data"
+    storedir = workdir + "/output"
 
-    cur_date = dt.datetime.combine(params['startdate'], dt.time(0))
+    cur_date = dt.datetime.combine(rundate, dt.time(0))
     if 'dailytime' in params and params['timestamp'] == 'daily':
         cur_date = dt.datetime.combine(cur_date, params['dailytime'])
 
@@ -202,14 +209,10 @@ def generate_inputfile(params):
 
     MetDefnFile = namedir + "/Resources/Defns/" + MetVals['MetDefnFileName']
     MetDeclnFile = utilsdir + "/MetDeclarations/" + MetVals['MetDeclFileName']
-    MetRestoreScript = utilsdir + "/MetRestore_JASMIN.ksh"
+    MetRestoreScript = "/group_workspaces/jasmin/name/cache/users/tforey/" + "MetRestore_JASMIN.ksh"
 
     params['npart'] = ParticlesPerSource
     params['ntimesperhour'] = nIntTimesPerHour
-
-    backwards = "No"
-    if params['runBackwards']:
-        backwards = "Yes"
 
     header = """
   ******************************************************************************
