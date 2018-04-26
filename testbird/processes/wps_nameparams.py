@@ -8,6 +8,8 @@ from testbird.write_inputfile import generate_inputfile
 from testbird.write_scriptfile import write_file
 from testbird.utils import daterange
 
+from datetime import datetime, timedelta
+
 import logging
 LOGGER = logging.getLogger("PYWPS")
 
@@ -129,18 +131,22 @@ class RunNAME(Process):
             else:
                 params[p] = request.inputs[p][0].data
 
-        # Will loop through all the dates in range, note need to add one day to the enddate
-        for cur_date in daterange(request.inputs['startdate'][0].data, request.inputs['enddate'][0].data):
-            with open('out.txt', 'w') as fout:
+        runtype = "FWD"
+        if params['runBackwards']:
+            runtype = "BCK"
+
+        lastfile = ""
+        # Will loop through all the dates in range, including the final day
+        for cur_date in daterange(request.inputs['startdate'][0].data,
+                                  request.inputs['enddate'][0].data + timedelta(days=1)):
+            with open("{}Run_{}_{}.txt".format(runtype, params['title'],
+                                               datetime.strftime(cur_date, "%Y%m%d")), 'w') as fout:
                 fout.write(generate_inputfile(params, cur_date))
                 response.outputs['NAMEinput'].file = fout.name
 
-            with open('out2.txt', 'w') as fout:
-                fout.write(write_file(params, cur_date))
-                response.outputs['NAMEscript'].file = fout.name
-
-            break # For testing, only run this on one day
-
+        with open('script.txt', 'w') as fout:
+            fout.write(write_file(params))
+            response.outputs['NAMEscript'].file = fout.name
 
         response.update_status("done", 100)
         return response

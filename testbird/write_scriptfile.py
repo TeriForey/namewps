@@ -1,6 +1,6 @@
-from datetime import datetime
 
-def write_file(params, cur_date):
+
+def write_file(params):
     """
     This will write the shell script file that will be used on JASMIN to run NAME
     :param params: the input parameters from the WPS process
@@ -28,6 +28,7 @@ def write_file(params, cur_date):
 
     # First we set the directories
 
+    lines.append("SCRIPTDIR=$PWD")
     lines.append("NAMEIIIDIR='{}'".format(namedir))
     lines.append("TOPOGDIR='{}'".format(topodir))
     lines.append("METDIR='{}'".format(metdir))
@@ -45,35 +46,41 @@ def write_file(params, cur_date):
     lines.append("# Switch to working directory")
     lines.append("cd ${WORKDIR}")
 
+    # Going to loop through each input file
+
+    lines.append('for filename in "$@" ; do')
+
     # Set input file
 
-    lines.append("# set input filename for NAME run")
-    lines.append("input_file='{}Run_{}_{}.txt'".format(runtype, params['title'],
-                                                                datetime.strftime(cur_date, "%Y%m%d")))
-    lines.append("# copy input file to right location")
-    lines.append("cp $1 ${input_file}")
+    # lines.append("# set input filename for NAME run")
+    # lines.append("input_file='{}Run_{}_{}.txt'".format(runtype, params['title'],
+    #                                                             datetime.strftime(cur_date, "%Y%m%d")))
+    lines.append("\t# copy input file to right location")
+    lines.append("\tcp ${SCRIPTDIR}/${filename} ${filename}")
     # lines.append("# set error filename for NAME run")
     # lines.append("error_file='{}Run_{}_{}Error.txt'".format(runtype, params['title'],
     #                                                           datetime.strftime(cur_date, "%Y%m%d")))
 
     # Run NAME
 
-    lines.append("echo '=============================='")
-    lines.append("echo 'Running NAME for {}'".format(datetime.strftime(cur_date, "%d/%m/%Y")))
-    lines.append("echo '=============================='")
-    lines.append("${NAMEIIIDIR}/Executables_Linux/nameiii_64bit_par.exe  ${input_file}")
+    lines.append("\techo '=============================='")
+    lines.append("\techo 'Running NAME on ${filename}'")
+    lines.append("\techo '=============================='")
+    lines.append("\t${NAMEIIIDIR}/Executables_Linux/nameiii_64bit_par.exe  ${filename}")
 
     # Rename output files
 
-    lines.append("# rename each file by start_date so dont overwrite")
+    lines.append("\t# rename each file by start_date so dont overwrite")
     for groupnum in range(1,len(params['elevationOut'])+1):
-        lines.append("cp -f ${WORKDIR}/group%s_* ${WORKDIR}/%s_group%s_%s.txt" % (groupnum, params['title'],
-                                                                                  groupnum,
-                                                                                  datetime.strftime(cur_date, "%Y%m%d")))
+        lines.append("\tcp -f ${WORKDIR}/group%s_* ${WORKDIR}/group_%s_${filename}" % (groupnum, groupnum))
+
+    # Exit loop
+
+    lines.append("done")
 
     # Finish
 
-    lines.append("echo 'Script $0 completing at {}' ".format(datetime.now()))
+    lines.append("echo 'Script $0 completed'")
     lines.append("# -------------------------------- END -------------------------------")
     lines.append("exit 0")
 
