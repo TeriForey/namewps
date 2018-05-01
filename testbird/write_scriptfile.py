@@ -1,4 +1,5 @@
-
+import os
+from .utils import getjasminconfigs
 
 def write_file(params):
     """
@@ -12,12 +13,14 @@ def write_file(params):
     if params['runBackwards']:
         runtype = "BCK"
 
-    workdir = "/group_workspaces/jasmin/name/cache/users/tforey/WPStest/{}_{}_{}".format(runtype, params['timestamp'],
-                                                                                         params['title'])
-    namedir = "/group_workspaces/jasmin/name/code/NAMEIII_v7_2_lotus"
-    topodir = "/group_workspaces/jasmin/name/code/NAMEIII_v7_2_lotus/Resources/Topog"
-    metdir = workdir + "/met_data"
-    storedir = workdir + "/output/"
+    jasminconfigs = getjasminconfigs()
+
+    userdir = jasminconfigs.get('jasmin', 'userdir')
+    workdir = os.path.join(userdir, 'WPStest', "{}_{}_{}".format(runtype, params['timestamp'], params['title']))
+    namedir = jasminconfigs.get('jasmin', 'namedir')
+    topodir = jasminconfigs.get('jasmin', 'topodir')
+    metdir = os.path.join(userdir, 'met_data')
+    storedir = os.path.join(workdir, "output")
 
     lines = []
 
@@ -70,9 +73,9 @@ def write_file(params):
 
     # Rename output files
 
-    lines.append("\t# rename each file by start_date so dont overwrite")
-    for groupnum in range(1,len(params['elevationOut'])+1):
-        lines.append("\tcp -f ${WORKDIR}/group%s_* ${WORKDIR}/group_%s_${filename}" % (groupnum, groupnum))
+    # lines.append("\t# rename each file by start_date so dont overwrite")
+    # for groupnum in range(1,len(params['elevationOut'])+1):
+    #     lines.append("\tcp -f ${WORKDIR}/group%s_* ${WORKDIR}/group_%s_${filename}" % (groupnum, groupnum))
 
     # Exit loop
 

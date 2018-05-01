@@ -1,9 +1,22 @@
 from datetime import datetime, timedelta
+import os
+import ConfigParser
 
 
 def daterange(start_date, end_date):
     for n in range(int ((end_date - start_date).days)):
         yield start_date + timedelta(n)
+
+
+def getjasminconfigs():
+    """
+    This will use ConfigParser to retrieve the JASMIN specific configurations
+    :return: configparser obj
+    """
+    cfile = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'jasmin.cfg')
+    cparser = ConfigParser.SafeConfigParser()
+    cparser.read([cfile])
+    return cparser
 
 
 def get_Mk_global(date):
