@@ -9,6 +9,7 @@ from testbird.write_scriptfile import write_file
 from testbird.utils import daterange
 
 from datetime import datetime, timedelta
+import os
 
 import logging
 LOGGER = logging.getLogger("PYWPS")
@@ -72,16 +73,8 @@ class RunNAME(Process):
                          abstract = 'end date of runs'),
             ]
         outputs = [
-            ComplexOutput('NAMEinput', 'Input file for running NAME',
-                          abstract="Input parameters in correct format",
-                          as_reference=True,
-                          supported_formats=[Format('text/plain')],
-                          ),
-            ComplexOutput('NAMEscript', 'Script file for running NAME',
-                          abstract="Bash script for running NAME",
-                          as_reference=True,
-                          supported_formats=[Format('text/plain')],
-                          ),
+            LiteralOutput('FileDir', 'Output file directory', data_type='string',
+                          abstract='Location of output files'),
             ]
 
         super(RunNAME, self).__init__(
@@ -135,18 +128,22 @@ class RunNAME(Process):
         if params['runBackwards']:
             runtype = "BCK"
 
-        lastfile = ""
+        outputdir = os.path.join("/home/t/trf5/birdhouse/testoutputs", "{}_{}_{}".format(runtype, params['timestamp'], params['title']))
+        if not os.path.exists(outputdir):
+            os.makedirs(outputdir)
         # Will loop through all the dates in range, including the final day
         for cur_date in daterange(request.inputs['startdate'][0].data,
                                   request.inputs['enddate'][0].data + timedelta(days=1)):
-            with open("{}Run_{}_{}.txt".format(runtype, params['title'],
-                                               datetime.strftime(cur_date, "%Y%m%d")), 'w') as fout:
+            with open(os.path.join(outputdir, "{}Run_{}_{}.txt".format(runtype, params['title'],
+                                               datetime.strftime(cur_date, "%Y%m%d"))), 'w') as fout:
                 fout.write(generate_inputfile(params, cur_date))
-                response.outputs['NAMEinput'].file = fout.name
 
-        with open('script.txt', 'w') as fout:
+        response.outputs['FileDir'].data = os.getcwd()
+
+        with open(os.path.join(outputdir, 'script.txt'), 'w') as fout:
             fout.write(write_file(params))
-            response.outputs['NAMEscript'].file = fout.name
+
+        response.outputs['FileDir'].data = outputdir
 
         response.update_status("done", 100)
         return response
