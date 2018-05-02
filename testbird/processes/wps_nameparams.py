@@ -10,6 +10,7 @@ from testbird.utils import daterange
 
 from datetime import datetime, timedelta
 import os
+import shutil
 
 import logging
 LOGGER = logging.getLogger("PYWPS")
@@ -25,15 +26,17 @@ class RunNAME(Process):
     """
     def __init__(self):
         inputs = [
+            LiteralInput('title', 'Title of run', data_type='string',
+                         abstract="Title of run"),
+            LiteralInput('longitude', 'Longitude', data_type='float',
+                         abstract="Location of release",
+                         default=16.863611),
             LiteralInput('latitude', 'Latitude', data_type='float',
                          abstract="Location of release",
                          default=-24.867222),
-            LiteralInput('longitude','Longitude', data_type='float',
-                         abstract="Location of release",
-                         default=16.863611),
-            LiteralInput('domain', 'Domain coordinates', data_type='string',
-                         abstract='Coordinates to seach within (minX,maxX,minY,maxY)',
-                         default='-120.0,80.0,-30.0,90.0', min_occurs=0),
+            BoundingBoxInput('domain', 'Domain coordinates', crss=['epsg:4326'],
+                         abstract='Coordinates to search within',
+                         min_occurs=1),
             LiteralInput('elevation','Elevation', data_type='integer',
                          abstract = "release elevation, m agl for land, m asl for marine release",
                          default=10, min_occurs=0),
@@ -43,8 +46,7 @@ class RunNAME(Process):
             LiteralInput('elevation_range_max', 'Elevation Range Max', data_type='integer',
                          abstract = "Maximum range of elevation",
                          default=None, min_occurs=0),
-            LiteralInput('title', 'Title of run', data_type='string',
-                         abstract = "Title of run"),
+
             LiteralInput('runBackwards', 'Run Backwards', data_type='boolean',
                          abstract = 'Whether to run backwards in time (default) or forwards',
                          default = '1', min_occurs=0),
@@ -75,6 +77,9 @@ class RunNAME(Process):
         outputs = [
             LiteralOutput('FileDir', 'Output file directory', data_type='string',
                           abstract='Location of output files'),
+            ComplexOutput('FileContents', 'Output files (zipped)',
+                          abstract="Output files (zipped)",
+                          supported_formats=[Format('application/x-zipped-shp')]),
             ]
 
         super(RunNAME, self).__init__(
@@ -104,14 +109,20 @@ class RunNAME(Process):
                     'The value "{}" does not contain a "-" character to define a range, '
                     'e.g. 0-100'.format(elevationrange.data))
 
-        # Process the string of domains into a list of floats.
+        LOGGER.debug("domains: %s" % (request.inputs['domain'][0].data))
         domains = []
-        if ',' not in request.inputs['domain'][0].data:
-            raise InvalidParameterValue("The domain coordinates must be split using a ','")
-        for val in request.inputs['domain'][0].data.split(','):
+        for val in request.inputs['domain'][0].data:
+            ## Values appear to be coming in as minY, minX, maxY, maxX
             domains.append(float(val))
-        if len(domains) != 4:
-            raise InvalidParameterValue("There must be four coordinates entered, minX,maxX,minY,maxY")
+
+        # Process the string of domains into a list of floats.
+        # domains = []
+        # if ',' not in request.inputs['domain'][0].data:
+        #     raise InvalidParameterValue("The domain coordinates must be split using a ','")
+        # for val in request.inputs['domain'][0].data.split(','):
+        #     domains.append(float(val))
+        # if len(domains) != 4:
+        #     raise InvalidParameterValue("There must be four coordinates entered, minX,maxX,minY,maxY")
 
         # Might want to change the elevation input to something similar to this as well so we don't have three separate params
 
@@ -144,6 +155,12 @@ class RunNAME(Process):
             fout.write(write_file(params))
 
         response.outputs['FileDir'].data = outputdir
+
+        # Zip all the output files into one directory to be served back to the user.
+        zippedfile = "{}_{}_{}".format(runtype, params['timestamp'], params['title'])
+        shutil.make_archive(zippedfile, 'zip', outputdir)
+
+        response.outputs['FileContents'].file = zippedfile+'.zip'
 
         response.update_status("done", 100)
         return response

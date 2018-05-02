@@ -69,10 +69,11 @@ Name,                             Quantity,      Species,                  Sourc
 
 def generate_coords(params, cur_date):
 
-    CompDom_Xmin = params['domain'][0]
-    CompDom_Xmax = params['domain'][1]
-    CompDom_Ymin = params['domain'][2]
-    CompDom_Ymax = params['domain'][3]
+    # Values come in as minY,minX,maxY,maxX
+    CompDom_Xmin = params['domain'][1]
+    CompDom_Xmax = params['domain'][3]
+    CompDom_Ymin = params['domain'][0]
+    CompDom_Ymax = params['domain'][2]
 
     coordsstrings = []
 
