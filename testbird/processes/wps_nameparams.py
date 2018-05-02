@@ -149,8 +149,6 @@ class RunNAME(Process):
                                                datetime.strftime(cur_date, "%Y%m%d"))), 'w') as fout:
                 fout.write(generate_inputfile(params, cur_date))
 
-        response.outputs['FileDir'].data = os.getcwd()
-
         with open(os.path.join(outputdir, 'script.txt'), 'w') as fout:
             fout.write(write_file(params))
 

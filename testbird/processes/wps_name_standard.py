@@ -9,6 +9,8 @@ from testbird.write_scriptfile import write_file
 from testbird.utils import daterange
 
 from datetime import datetime, timedelta
+import shutil
+import os
 
 import logging
 LOGGER = logging.getLogger("PYWPS")
@@ -46,16 +48,11 @@ class RunNAMEstandard(Process):
                          abstract = 'end date of runs (YYYY-MM-DD)')
             ]
         outputs = [
-            ComplexOutput('NAMEinput', 'Input file for running NAME',
-                          abstract="Input parameters in correct format",
-                          as_reference=True,
-                          supported_formats=[Format('text/plain')],
-                          ),
-            ComplexOutput('NAMEscript', 'Script file for running NAME',
-                          abstract="Bash script for running NAME",
-                          as_reference=True,
-                          supported_formats=[Format('text/plain')],
-                          ),
+            LiteralOutput('FileDir', 'Output file directory', data_type='string',
+                          abstract='Location of output files'),
+            ComplexOutput('FileContents', 'Output files (zipped)',
+                          abstract="Output files (zipped)",
+                          supported_formats=[Format('application/x-zipped-shp')]),
             ]
 
         super(RunNAMEstandard, self).__init__(
@@ -97,11 +94,11 @@ class RunNAMEstandard(Process):
         if params['title'] == "CAPEVERDE":
             params['longitude'] = 16.863611
             params['latitude'] = -24.867222
-            params['domain'] = [-120.0,80.0,-30.0,90.0]
+            params['domain'] = [-30.0, -120.0, 90.0, 80.0] # minY,minX,maxY,maxX
         elif params['title'] == "BEIJING":
             params['longitude'] = 100.9
             params['latitude'] = 36.28
-            params['domain'] = [30.0, 170.0, -10.0, 80.0]
+            params['domain'] = [-10.0, 30.0, 80.0, 170.0]
 
         params['elevation'] = 100
         params['timeFmt'] = "days"
@@ -112,17 +109,28 @@ class RunNAMEstandard(Process):
         if params['runBackwards']:
             runtype = "BCK"
 
+        outputdir = os.path.join("/home/t/trf5/birdhouse/testoutputs",
+                                 "{}_{}_{}".format(runtype, params['timestamp'], params['title']))
+        if not os.path.exists(outputdir):
+            os.makedirs(outputdir)
         # Will loop through all the dates in range, including the final day
         for cur_date in daterange(request.inputs['startdate'][0].data,
                                   request.inputs['enddate'][0].data + timedelta(days=1)):
-            with open("{}Run_{}_{}.txt".format(runtype, params['title'],
-                                               datetime.strftime(cur_date, "%Y%m%d")), 'w') as fout:
+            with open(os.path.join(outputdir, "{}Run_{}_{}.txt".format(runtype, params['title'],
+                                                                       datetime.strftime(cur_date, "%Y%m%d"))),
+                      'w') as fout:
                 fout.write(generate_inputfile(params, cur_date))
-                response.outputs['NAMEinput'].file = fout.name
 
-        with open('script.txt', 'w') as fout:
+        with open(os.path.join(outputdir, 'script.txt'), 'w') as fout:
             fout.write(write_file(params))
-            response.outputs['NAMEscript'].file = fout.name
+
+        response.outputs['FileDir'].data = outputdir
+
+        # Zip all the output files into one directory to be served back to the user.
+        zippedfile = "{}_{}_{}".format(runtype, params['timestamp'], params['title'])
+        shutil.make_archive(zippedfile, 'zip', outputdir)
+
+        response.outputs['FileContents'].file = zippedfile + '.zip'
 
         response.update_status("done", 100)
         return response
