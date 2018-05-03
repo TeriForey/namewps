@@ -92,15 +92,15 @@ class RunNAMEstandard(Process):
                 params[p] = request.inputs[p][0].data
 
         if params['title'] == "CAPEVERDE":
-            params['longitude'] = 16.863611
-            params['latitude'] = -24.867222
+            params['longitude'] = -24.867222
+            params['latitude'] = 16.863611
             params['domain'] = [-30.0, -120.0, 90.0, 80.0] # minY,minX,maxY,maxX
         elif params['title'] == "BEIJING":
             params['longitude'] = 100.9
             params['latitude'] = 36.28
             params['domain'] = [-10.0, 30.0, 80.0, 170.0]
 
-        params['elevation'] = 100
+        params['elevation'] = 10
         params['timeFmt'] = "days"
         params['timestamp'] = '3-hourly'
 
