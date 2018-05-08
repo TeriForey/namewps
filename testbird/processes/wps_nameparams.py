@@ -10,6 +10,7 @@ from testbird.utils import daterange
 
 from datetime import datetime, timedelta
 import os
+import stat
 import shutil
 
 import logging
@@ -149,8 +150,11 @@ class RunNAME(Process):
                                                datetime.strftime(cur_date, "%Y%m%d"))), 'w') as fout:
                 fout.write(generate_inputfile(params, cur_date))
 
-        with open(os.path.join(outputdir, 'script.txt'), 'w') as fout:
+        with open(os.path.join(outputdir, 'script.sh'), 'w') as fout:
             fout.write(write_file(params))
+
+        st = os.stat(os.path.join(outputdir, 'script.sh'))
+        os.chmod(os.path.join(outputdir, 'script.sh'), st.st_mode | 0111)
 
         response.outputs['FileDir'].data = outputdir
 

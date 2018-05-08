@@ -122,8 +122,11 @@ class RunNAMEstandard(Process):
                       'w') as fout:
                 fout.write(generate_inputfile(params, cur_date))
 
-        with open(os.path.join(outputdir, 'script.txt'), 'w') as fout:
+        with open(os.path.join(outputdir, 'script.sh'), 'w') as fout:
             fout.write(write_file(params))
+
+        st = os.stat(os.path.join(outputdir, 'script.sh'))
+        os.chmod(os.path.join(outputdir, 'script.sh'), st.st_mode | 0111)
 
         # TODO: Need to trim directory name, report only user/run specific details
         response.outputs['FileDir'].data = outputdir
