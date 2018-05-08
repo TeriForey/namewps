@@ -5,9 +5,6 @@ from .wps_nameparams import RunNAME
 from .wps_name_standard import RunNAMEstandard
 
 processes = [
-    WordCounter(),
-    InOut(),
-    MakeMap(),
-    RunNAME(),
     RunNAMEstandard(),
+    RunNAME(),
 ]

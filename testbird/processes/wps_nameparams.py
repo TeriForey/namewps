@@ -85,7 +85,7 @@ class RunNAME(Process):
         super(RunNAME, self).__init__(
             self._handler,
             identifier='runname',
-            title='Run NAME-on-JASMIN',
+            title='Run NAME-on-JASMIN - Advanced',
             abstract="Passes input arguments onto NAME",
             version='0.1',
             metadata=[
