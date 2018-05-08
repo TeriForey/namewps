@@ -58,7 +58,7 @@ class RunNAMEstandard(Process):
         super(RunNAMEstandard, self).__init__(
             self._handler,
             identifier='runnamestd',
-            title='Run standard NAME-on-JASMIN',
+            title='Run NAME-on-JASMIN - Standard',
             abstract="Passes input arguments onto NAME",
             version='0.1',
             metadata=[
