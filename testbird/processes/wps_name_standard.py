@@ -109,6 +109,7 @@ class RunNAMEstandard(Process):
         if params['runBackwards']:
             runtype = "BCK"
 
+        # TODO: Need to pull in jasmin config file and set the output dir accordingly
         outputdir = os.path.join("/home/t/trf5/birdhouse/testoutputs",
                                  "{}_{}_{}".format(runtype, params['timestamp'], params['title']))
         if not os.path.exists(outputdir):
@@ -124,6 +125,7 @@ class RunNAMEstandard(Process):
         with open(os.path.join(outputdir, 'script.txt'), 'w') as fout:
             fout.write(write_file(params))
 
+        # TODO: Need to trim directory name, report only user/run specific details
         response.outputs['FileDir'].data = outputdir
 
         # Zip all the output files into one directory to be served back to the user.
