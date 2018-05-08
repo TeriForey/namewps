@@ -2,6 +2,7 @@ import os
 import stat
 import shutil
 from datetime import timedelta, datetime
+from pynameplot import Name, drawMap
 
 from .utils import daterange
 from .write_inputfile import generate_inputfile
@@ -37,6 +38,15 @@ def run_name(params):
 
     st = os.stat(os.path.join(outputdir, 'script.sh'))
     os.chmod(os.path.join(outputdir, 'script.sh'), st.st_mode | 0111)
+
+    """
+    Going to 'create' an output file that we will then plot, treating it as though it were an actual result.
+    """
+    fakefile = "/home/t/trf5/birdhouse/testoutputs/20171101_output.txt"
+
+    # n = Name(fakefile)
+    # mapfile = "ExamplePlot.png"
+    # drawMap(n, n.timestamps[0], outfile=mapfile, outdir=outputdir)
 
     # TODO: Need to trim directory name, report only user/run specific details
 
