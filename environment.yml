@@ -2,6 +2,7 @@ name: testbird
 channels:
 - birdhouse
 - conda-forge
+- teriforey
 - defaults
 dependencies:
 - python=2.7
@@ -33,6 +34,7 @@ dependencies:
 # testbird
 - matplotlib
 - cartopy
+- pynameplot
 - pip:
   - sphinx-autoapi==0.5.0
   - -e git+https://github.com/huard/sphinx-autodoc-pywps.git#egg=sphinx_autodoc_pywps

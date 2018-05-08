@@ -4,6 +4,8 @@ from pywps import LiteralInput, LiteralOutput, BoundingBoxInput
 from pywps.exceptions import InvalidParameterValue
 from pywps.app.Common import Metadata
 
+from testbird.run_name import run_name
+
 from testbird.write_inputfile import generate_inputfile
 from testbird.write_scriptfile import write_file
 from testbird.utils import daterange
@@ -136,32 +138,9 @@ class RunNAME(Process):
             else:
                 params[p] = request.inputs[p][0].data
 
-        runtype = "FWD"
-        if params['runBackwards']:
-            runtype = "BCK"
+        outdir, zippedfile = run_name(params)
 
-        outputdir = os.path.join("/home/t/trf5/birdhouse/testoutputs", "{}_{}_{}".format(runtype, params['timestamp'], params['title']))
-        if not os.path.exists(outputdir):
-            os.makedirs(outputdir)
-        # Will loop through all the dates in range, including the final day
-        for cur_date in daterange(request.inputs['startdate'][0].data,
-                                  request.inputs['enddate'][0].data + timedelta(days=1)):
-            with open(os.path.join(outputdir, "{}Run_{}_{}.txt".format(runtype, params['title'],
-                                               datetime.strftime(cur_date, "%Y%m%d"))), 'w') as fout:
-                fout.write(generate_inputfile(params, cur_date))
-
-        with open(os.path.join(outputdir, 'script.sh'), 'w') as fout:
-            fout.write(write_file(params))
-
-        st = os.stat(os.path.join(outputdir, 'script.sh'))
-        os.chmod(os.path.join(outputdir, 'script.sh'), st.st_mode | 0111)
-
-        response.outputs['FileDir'].data = outputdir
-
-        # Zip all the output files into one directory to be served back to the user.
-        zippedfile = "{}_{}_{}".format(runtype, params['timestamp'], params['title'])
-        shutil.make_archive(zippedfile, 'zip', outputdir)
-
+        response.outputs['FileDir'].data = outdir
         response.outputs['FileContents'].file = zippedfile+'.zip'
 
         response.update_status("done", 100)
