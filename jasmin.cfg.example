@@ -3,3 +3,4 @@ userdir = /path/to/user
 namedir = /path/to/name_executable
 topodir = /path/to/topo_resources
 utilsdir = /path/to/utilities
+outputdir = /path/to/outputs

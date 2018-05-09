@@ -4,7 +4,7 @@ import shutil
 from datetime import timedelta, datetime
 from pynameplot import Name, drawMap
 
-from .utils import daterange
+from .utils import daterange, getjasminconfigs
 from .write_inputfile import generate_inputfile
 from .write_scriptfile import write_file
 
@@ -20,8 +20,10 @@ def run_name(params):
     if params['runBackwards']:
         runtype = "BCK"
 
+    jasconfigs = getjasminconfigs()
+
     # TODO: Need to pull in jasmin config file and set the output dir accordingly
-    outputdir = os.path.join("/home/t/trf5/birdhouse/testoutputs",
+    outputdir = os.path.join(jasconfigs.get('jasmin', 'outputdir'),
                              "{}_{}_{}".format(runtype, params['timestamp'], params['title']))
     if not os.path.exists(outputdir):
         os.makedirs(outputdir)
@@ -42,7 +44,7 @@ def run_name(params):
     """
     Going to 'create' an output file that we will then plot, treating it as though it were an actual result.
     """
-    fakefile = "/home/t/trf5/birdhouse/testoutputs/20171101_output.txt"
+    fakefile = os.path.join(jasconfigs.get('jasmin', 'outputdir'), '20171101_output.txt')
 
     n = Name(fakefile)
     mapfile = "ExamplePlot.png"
