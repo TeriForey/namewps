@@ -82,7 +82,12 @@ class RunNAME(Process):
                           abstract='Location of output files'),
             ComplexOutput('FileContents', 'Output files (zipped)',
                           abstract="Output files (zipped)",
-                          supported_formats=[Format('application/x-zipped-shp')]),
+                          supported_formats=[Format('application/x-zipped-shp')],
+                          as_reference=True),
+            ComplexOutput('ExamplePlot', 'Example Plot of initial time point',
+                          abstract='Example plot of initial time point',
+                          supported_formats=[Format('image/tiff')],
+                          as_reference=True),
             ]
 
         super(RunNAME, self).__init__(
@@ -138,10 +143,11 @@ class RunNAME(Process):
             else:
                 params[p] = request.inputs[p][0].data
 
-        outdir, zippedfile = run_name(params)
+        outdir, zippedfile, mapfile = run_name(params)
 
+        response.outputs['FileContents'].file = zippedfile + '.zip'
         response.outputs['FileDir'].data = outdir
-        response.outputs['FileContents'].file = zippedfile+'.zip'
+        response.outputs['ExamplePlot'].file = mapfile
 
         response.update_status("done", 100)
         return response
