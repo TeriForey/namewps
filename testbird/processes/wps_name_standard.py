@@ -35,7 +35,7 @@ class RunNAMEstandard(Process):
                          default = '1', min_occurs=0),
             LiteralInput('time', 'Time to run model over', data_type='integer',
                          abstract = 'Number of days model will run over',
-                         allowed_values=[1,5,10]),
+                         allowed_values=[1,5,10], default=1, min_occurs=0),
             LiteralInput('elevationOut', 'Elevation averaging ranges', data_type='string',
                          abstract='Elevation range where the particle number is counted (m agl)'
                                   " Example: 0-100",
