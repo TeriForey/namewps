@@ -54,6 +54,9 @@ class RunNAMEstandard(Process):
             ComplexOutput('FileContents', 'Output files (zipped)',
                           abstract="Output files (zipped)",
                           supported_formats=[Format('application/x-zipped-shp')]),
+            ComplexOutput('ExamplePlot', 'Example Plot of initial time point',
+                          abstract='Example plot of initial time point',
+                          supported_formats=[Format('image/tiff')]),
             ]
 
         super(RunNAMEstandard, self).__init__(
@@ -105,10 +108,12 @@ class RunNAMEstandard(Process):
         params['timeFmt'] = "days"
         params['timestamp'] = '3-hourly'
 
-        outdir, zippedfile = run_name(params)
+        outdir, zippedfile, mapfile = run_name(params)
 
         response.outputs['FileContents'].file = zippedfile + '.zip'
         response.outputs['FileDir'].data = outdir
+        response.outputs['ExamplePlot'].file = mapfile
+        #response.outputs['ExamplePlot'].data = "request didn't have a netcdf file."
 
         response.update_status("done", 100)
         return response

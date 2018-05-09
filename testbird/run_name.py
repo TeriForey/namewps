@@ -44,9 +44,9 @@ def run_name(params):
     """
     fakefile = "/home/t/trf5/birdhouse/testoutputs/20171101_output.txt"
 
-    # n = Name(fakefile)
-    # mapfile = "ExamplePlot.png"
-    # drawMap(n, n.timestamps[0], outfile=mapfile, outdir=outputdir)
+    n = Name(fakefile)
+    mapfile = "ExamplePlot.png"
+    drawMap(n, n.timestamps[0], outfile=mapfile)
 
     # TODO: Need to trim directory name, report only user/run specific details
 
@@ -54,4 +54,4 @@ def run_name(params):
     zippedfile = "{}_{}_{}".format(runtype, params['timestamp'], params['title'])
     shutil.make_archive(zippedfile, 'zip', outputdir)
 
-    return outputdir, zippedfile
+    return outputdir, zippedfile, mapfile
