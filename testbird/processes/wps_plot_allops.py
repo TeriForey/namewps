@@ -81,10 +81,12 @@ class PlotAll(Process):
                 else:
                     n = Name(os.path.join(request.inputs['filelocation'][0].data, filename))
                     if 'timestamp' in request.inputs:
+                        timestamp = datetime.strftime(request.inputs['timestamp'][0].data, "%d/%m/%Y %H:%M UTC")
                         LOGGER.debug(request.inputs['timestamp'][0].data)
                         LOGGER.debug(n.timestamps)
-                        if request.inputs['timestamp'][0].data in n.timestamps:
-                            drawMap(n, request.inputs['timestamp'][0].data, outdir=outdir)
+                        LOGGER.debug(timestamp)
+                        if timestamp in n.timestamps:
+                            drawMap(n, timestamp, outdir=outdir)
                     else:
                         for column in n.timestamps:
                             drawMap(n, column, outdir=outdir)

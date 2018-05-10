@@ -19,6 +19,7 @@ def test_wps_plot_allops_simple():
         datainputs=datainputs)
     assert_response_success(resp)
 
+
 @pytest.mark.online
 def test_wps_plot_allops_timestamp():
     client = client_for(Service(processes=[PlotAll()]))
