@@ -34,7 +34,7 @@ class PlotAll(Process):
                          min_occurs=0),
             LiteralInput('summarise', 'Summarise by', data_type='string',
                          abstract='Plot summaries of each day/week/month/year',
-                         allowed_values=['day', 'week', 'month', 'year', 'all'], min_occurs=0),
+                         allowed_values=['None', 'day', 'week', 'month', 'year', 'all'], default='None'),
             LiteralInput('station', 'Release location', data_type='string',
                          abstract='Location of release (X, Y)', min_occurs=0)
             ]
@@ -76,17 +76,18 @@ class PlotAll(Process):
         outdir = "Allplots"
         for filename in os.listdir(request.inputs['filelocation'][0].data):
             if filename.endswith('.txt'):
-                if 'summarise' in request.inputs:
+                if request.inputs['summarise'][0].data != 'None':
                     pass
                 else:
                     n = Name(os.path.join(request.inputs['filelocation'][0].data, filename))
                     if 'timestamp' in request.inputs:
-                        print request.inputs['timestamp'][0].data
-                        print n.timestamps
+                        LOGGER.debug(request.inputs['timestamp'][0].data)
+                        LOGGER.debug(n.timestamps)
                         if request.inputs['timestamp'][0].data in n.timestamps:
+                            drawMap(n, request.inputs['timestamp'][0].data, outdir=outdir)
+                    else:
+                        for column in n.timestamps:
                             drawMap(n, column, outdir=outdir)
-                    for column in n.timestamps:
-                        drawMap(n, column, outdir=outdir)
 
         zippedfile = "plots"
         shutil.make_archive(zippedfile, 'zip', outdir)
