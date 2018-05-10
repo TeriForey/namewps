@@ -29,6 +29,14 @@ class PlotAll(Process):
         inputs = [
             LiteralInput('filelocation', 'Output file location', data_type='string',
                          abstract="Run ID that identifies the output file locations"),
+            LiteralInput('timestamp', 'Plot specific timestamp', data_type='dateTime',
+                         abstract="Plot only a specific date and time. Excludes the creation of summary plots",
+                         min_occurs=0),
+            LiteralInput('summarise', 'Summarise by', data_type='string',
+                         abstract='Plot summaries of each day/week/month/year',
+                         allowed_values=['day', 'week', 'month', 'year', 'all'], min_occurs=0),
+            LiteralInput('station', 'Release location', data_type='string',
+                         abstract='Location of release (X, Y)', min_occurs=0)
             ]
         outputs = [
             ComplexOutput('FileContents', 'All plot files (zipped)',
@@ -57,17 +65,33 @@ class PlotAll(Process):
 
     def _handler(self, request, response):
 
+
+        plotoptions = {}
+        plotoptions['outdir'] = "Allplots"
+        for p in request.inputs:
+            if p == "timestamp" or p == "filelocation" or p == "summarise":
+                continue
+            plotoptions[p] = request.inputs[p][0].data
+
         outdir = "Allplots"
         for filename in os.listdir(request.inputs['filelocation'][0].data):
             if filename.endswith('.txt'):
-                n = Name(os.path.join(request.inputs['filelocation'][0].data, filename))
-                for column in n.timestamps:
-                    drawMap(n, column, outdir=outdir)
+                if 'summarise' in request.inputs:
+                    pass
+                else:
+                    n = Name(os.path.join(request.inputs['filelocation'][0].data, filename))
+                    if 'timestamp' in request.inputs:
+                        print request.inputs['timestamp'][0].data
+                        print n.timestamps
+                        if request.inputs['timestamp'][0].data in n.timestamps:
+                            drawMap(n, column, outdir=outdir)
+                    for column in n.timestamps:
+                        drawMap(n, column, outdir=outdir)
 
         zippedfile = "plots"
         shutil.make_archive(zippedfile, 'zip', outdir)
 
-        print os.path.getsize(zippedfile+'.zip')
+        LOGGER.debug("Zipped file: %s (%s bytes)" % (zippedfile+'.zip', os.path.getsize(zippedfile+'.zip')))
 
         response.outputs['FileContents'].file = zippedfile + '.zip'
 
