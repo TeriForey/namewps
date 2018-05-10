@@ -14,6 +14,7 @@ from pynameplot.namereader import util
 from datetime import datetime, timedelta
 import shutil
 import os
+import calendar
 
 import logging
 LOGGER = logging.getLogger("PYWPS")
@@ -72,14 +73,18 @@ class PlotAll(Process):
         for p in request.inputs:
             if p == "timestamp" or p == "filelocation" or p == "summarise":
                 continue
-            plotoptions[p] = request.inputs[p][0].data
+            if p == 'station':
+                statcoords = request.inputs[p][0].data.split(',')
+                plotoptions[p] = (statcoords[0].strip(), statcoords[1].strip())
+            else:
+                plotoptions[p] = request.inputs[p][0].data
 
-        outdir = "Allplots"
+        s = Sum(request.inputs['filelocation'][0].data)
+
+        LOGGER.debug("Plot options: %s" % (plotoptions))
 
         if request.inputs['summarise'][0].data == 'week':
-            s = Sum(request.inputs['filelocation'][0].data)
-            column = 'total'
-            for week in range(1, 52):
+            for week in range(1, 53):
                 s.sumWeek(week)
                 if len(s.files) == 0:
                     LOGGER.debug("No files found for week %s" % (week))
@@ -87,7 +92,38 @@ class PlotAll(Process):
                 plotoptions['caption'] = "{} {} {} {}: {} week {} sum".format(s.runname, s.averaging, s.altitude,
                                                                               s.direction, s.year, week)
                 plotoptions['outfile'] = "{}_{}_{}_weekly.png".format(s.runname, s.year, week)
-                drawMap(s, column, **plotoptions)
+                drawMap(s, 'total', **plotoptions)
+
+        elif request.inputs['summarise'][0].data == 'month':
+            for month in range(1, 13):
+                s.sumMonth(str(month))
+                if len(s.files) == 0:
+                    LOGGER.debug("No files found for month %s" % (month))
+                    continue
+                plotoptions['caption'] = "{} {} {} {}: {} {} sum".format(s.runname, s.averaging, s.altitude,
+                                                                         s.direction, s.year,
+                                                                         calendar.month_name[month])
+                plotoptions['outfile'] = "{}_{}_{}_monthly.png".format(s.runname, s.year, month)
+                drawMap(s, 'total', **plotoptions)
+
+        # if request.inputs['summarise'][0].data == 'year':
+        #     s = Sum(request.inputs['filelocation'][0].data)
+        #     column = 'total'
+        #     for year in range(1, ):
+        #         s.sumWeek(week)
+        #         if len(s.files) == 0:
+        #             LOGGER.debug("No files found for week %s" % (week))
+        #             continue
+        #         plotoptions['caption'] = "{} {} {} {}: {} week {} sum".format(s.runname, s.averaging, s.altitude,
+        #                                                                       s.direction, s.year, week)
+        #         plotoptions['outfile'] = "{}_{}_{}_weekly.png".format(s.runname, s.year, week)
+        #         drawMap(s, column, **plotoptions)
+        elif request.inputs['summarise'][0].data == 'all':
+            s.sumAll()
+
+            plotoptions['caption'] = "{} {} {} {}: Summed".format(s.runname, s.averaging, s.altitude, s.direction)
+            plotoptions['outfile'] = "{}_summed_all.png".format(s.runname)
+            drawMap(s, 'total', **plotoptions)
         else:
             for filename in os.listdir(request.inputs['filelocation'][0].data):
                 if filename.endswith('.txt'):
@@ -111,12 +147,16 @@ class PlotAll(Process):
                             for column in n.timestamps:
                                 drawMap(n, column, **plotoptions)
 
-        zippedfile = "plots"
-        shutil.make_archive(zippedfile, 'zip', outdir)
+        if not os.path.exists(plotoptions['outdir']):
+            LOGGER.debug("Did not create any plots")
+            response.outputs['FileContents'].data = "No plots created"
+        else:
+            zippedfile = "plots"
+            shutil.make_archive(zippedfile, 'zip', plotoptions['outdir'])
 
-        LOGGER.debug("Zipped file: %s (%s bytes)" % (zippedfile+'.zip', os.path.getsize(zippedfile+'.zip')))
+            LOGGER.debug("Zipped file: %s (%s bytes)" % (zippedfile+'.zip', os.path.getsize(zippedfile+'.zip')))
 
-        response.outputs['FileContents'].file = zippedfile + '.zip'
+            response.outputs['FileContents'].file = zippedfile + '.zip'
 
         response.update_status("done", 100)
         return response

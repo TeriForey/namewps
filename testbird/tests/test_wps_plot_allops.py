@@ -60,3 +60,32 @@ def test_wps_plot_allops_weeksum():
         identifier='plotall',
         datainputs=datainputs)
     assert_response_success(resp)
+
+
+@pytest.mark.online
+def test_wps_plot_allops_monthsum():
+    client = client_for(Service(processes=[PlotAll()]))
+    datainputs = "filelocation={};summarise={}".format(
+        "/home/t/trf5/birdhouse/testoutputs/BCK_3-hourly_CAPEVERDE/Outputs",
+        "month"
+    )
+    resp = client.get(
+        service='wps', request='execute', version='1.0.0',
+        identifier='plotall',
+        datainputs=datainputs)
+    assert_response_success(resp)
+
+
+@pytest.mark.online
+def test_wps_plot_allops_allsum():
+    client = client_for(Service(processes=[PlotAll()]))
+    datainputs = "filelocation={};summarise={}".format(
+        "/home/t/trf5/birdhouse/testoutputs/BCK_3-hourly_CAPEVERDE/Outputs",
+        "all"
+    )
+    resp = client.get(
+        service='wps', request='execute', version='1.0.0',
+        identifier='plotall',
+        datainputs=datainputs)
+    assert_response_success(resp)
+
