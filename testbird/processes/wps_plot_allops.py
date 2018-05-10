@@ -45,7 +45,8 @@ class PlotAll(Process):
                          abstract='Min and Max longitude to plot (Min,Max)', min_occurs=0),
             LiteralInput('lat_bounds', 'Latitudinal boundary', data_type='string',
                          abstract='Min and Max latitude boundary', min_occurs=0),
-
+            LiteralInput('scale', 'Particle concentration scale', data_type='string',
+                         abstract='Particle concentration scale (Min,Max)', default="5.e-9, 1.e-5"),
             ]
         outputs = [
             ComplexOutput('FileContents', 'All plot files (zipped)',
@@ -80,9 +81,12 @@ class PlotAll(Process):
         for p in request.inputs:
             if p == "timestamp" or p == "filelocation" or p == "summarise":
                 continue
-            if p == 'station' or p == 'lon_bounds' or p == 'lat_bounds':
+            if p == 'station' or p == 'lon_bounds' or p == 'lat_bounds' or p == 'scale':
                 statcoords = request.inputs[p][0].data.split(',')
                 plotoptions[p] = (statcoords[0].strip(), statcoords[1].strip())
+                if p == 'scale':
+                    minscale, maxscale = plotoptions[p]
+                    plotoptions[p] = (float(minscale), float(maxscale))
             else:
                 plotoptions[p] = request.inputs[p][0].data
 
