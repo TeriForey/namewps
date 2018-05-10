@@ -38,7 +38,14 @@ class PlotAll(Process):
                          abstract='Plot summaries of each day/week/month/year',
                          allowed_values=['NA', 'day', 'week', 'month', 'year', 'all'], default='NA'),
             LiteralInput('station', 'Release location', data_type='string',
-                         abstract='Location of release (X, Y)', min_occurs=0)
+                         abstract='Location of release (X, Y)', min_occurs=0),
+            LiteralInput('projection', 'Plot projection', data_type='string',
+                         abstract='Map projection', allowed_values=['cyl', 'npstere', 'spstere'], min_occurs=0),
+            LiteralInput('lon_bounds', 'Longitudinal boundary', data_type='string',
+                         abstract='Min and Max longitude to plot (Min,Max)', min_occurs=0),
+            LiteralInput('lat_bounds', 'Latitudinal boundary', data_type='string',
+                         abstract='Min and Max latitude boundary', min_occurs=0),
+
             ]
         outputs = [
             ComplexOutput('FileContents', 'All plot files (zipped)',
