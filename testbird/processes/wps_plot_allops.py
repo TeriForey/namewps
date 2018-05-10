@@ -54,7 +54,7 @@ class PlotAll(Process):
         outputs = [
             ComplexOutput('FileContents', 'Plot file(s)',
                           abstract="Plot files",
-                          supported_formats=[Format('application/x-zipped-shp'), Format('image/tiff')],
+                          supported_formats=[Format('application/x-zipped-shp'), FORMATS.GEOTIFF],
                           as_reference=True),
             # ComplexOutput('SinglePlot', 'A single output plot',
             #               abstract='One output plot',
@@ -169,7 +169,7 @@ class PlotAll(Process):
         else:
             if len(os.listdir(plotoptions['outdir'])) == 1:
                 LOGGER.debug("Only one output plot")
-                #response.outputs['FileContents'].data_format = FORMATS.GEOTIFF
+                response.outputs['FileContents'].data_format = FORMATS.GEOTIFF
                 response.outputs['FileContents'].file = os.path.join(plotoptions['outdir'],
                                                                      os.listdir(plotoptions['outdir'])[0])
             else:
