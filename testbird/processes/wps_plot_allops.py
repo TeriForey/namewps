@@ -1,17 +1,12 @@
 from pywps import Process
-from pywps import ComplexInput, ComplexOutput, Format, FORMATS
-from pywps import LiteralInput, LiteralOutput, BoundingBoxInput
-from pywps.exceptions import InvalidParameterValue
+from pywps import ComplexOutput, Format, FORMATS
+from pywps import LiteralInput
 from pywps.app.Common import Metadata
 
-from testbird.write_inputfile import generate_inputfile
-from testbird.write_scriptfile import write_file
-from testbird.utils import daterange
-from testbird.run_name import run_name
 from pynameplot import Name, drawMap, Sum
 from pynameplot.namereader import util
 
-from datetime import datetime, timedelta
+from datetime import datetime
 import shutil
 import os
 import calendar
@@ -56,10 +51,6 @@ class PlotAll(Process):
                           abstract="Plot files",
                           supported_formats=[Format('application/x-zipped-shp'), FORMATS.GEOTIFF],
                           as_reference=True),
-            # ComplexOutput('SinglePlot', 'A single output plot',
-            #               abstract='One output plot',
-            #               supported_formats=[Format('image/tiff')],
-            #               as_reference=True),
             ]
 
         super(PlotAll, self).__init__(
@@ -96,13 +87,13 @@ class PlotAll(Process):
 
         s = Sum(request.inputs['filelocation'][0].data)
 
-        LOGGER.debug("Plot options: %s" % (plotoptions))
+        LOGGER.debug("Plot options: %s" % plotoptions)
 
         if request.inputs['summarise'][0].data == 'week':
             for week in range(1, 53):
                 s.sumWeek(week)
                 if len(s.files) == 0:
-                    LOGGER.debug("No files found for week %s" % (week))
+                    LOGGER.debug("No files found for week %s" % week)
                     continue
                 plotoptions['caption'] = "{} {} {} {}: {} week {} sum".format(s.runname, s.averaging, s.altitude,
                                                                               s.direction, s.year, week)
@@ -113,7 +104,7 @@ class PlotAll(Process):
             for month in range(1, 13):
                 s.sumMonth(str(month))
                 if len(s.files) == 0:
-                    LOGGER.debug("No files found for month %s" % (month))
+                    LOGGER.debug("No files found for month %s" % month)
                     continue
                 plotoptions['caption'] = "{} {} {} {}: {} {} sum".format(s.runname, s.averaging, s.altitude,
                                                                          s.direction, s.year,
@@ -121,18 +112,6 @@ class PlotAll(Process):
                 plotoptions['outfile'] = "{}_{}_{}_monthly.png".format(s.runname, s.year, month)
                 drawMap(s, 'total', **plotoptions)
 
-        # if request.inputs['summarise'][0].data == 'year':
-        #     s = Sum(request.inputs['filelocation'][0].data)
-        #     column = 'total'
-        #     for year in range(1, ):
-        #         s.sumWeek(week)
-        #         if len(s.files) == 0:
-        #             LOGGER.debug("No files found for week %s" % (week))
-        #             continue
-        #         plotoptions['caption'] = "{} {} {} {}: {} week {} sum".format(s.runname, s.averaging, s.altitude,
-        #                                                                       s.direction, s.year, week)
-        #         plotoptions['outfile'] = "{}_{}_{}_weekly.png".format(s.runname, s.year, week)
-        #         drawMap(s, column, **plotoptions)
         elif request.inputs['summarise'][0].data == 'all':
             s.sumAll()
 
@@ -155,7 +134,7 @@ class PlotAll(Process):
                         n = Name(os.path.join(request.inputs['filelocation'][0].data, filename))
                         if 'timestamp' in request.inputs:
                             timestamp = datetime.strftime(request.inputs['timestamp'][0].data, "%d/%m/%Y %H:%M UTC")
-                            LOGGER.debug("Reformatted time: %s" % (timestamp))
+                            LOGGER.debug("Reformatted time: %s" % timestamp)
                             if timestamp in n.timestamps:
                                 drawMap(n, timestamp, **plotoptions)
                         else:

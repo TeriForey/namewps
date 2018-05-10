@@ -1,17 +1,10 @@
 from pywps import Process
-from pywps import ComplexInput, ComplexOutput, Format
-from pywps import LiteralInput, LiteralOutput, BoundingBoxInput
+from pywps import ComplexOutput, Format
+from pywps import LiteralInput, LiteralOutput
 from pywps.exceptions import InvalidParameterValue
 from pywps.app.Common import Metadata
 
-from testbird.write_inputfile import generate_inputfile
-from testbird.write_scriptfile import write_file
-from testbird.utils import daterange
 from testbird.run_name import run_name
-
-from datetime import datetime, timedelta
-import shutil
-import os
 
 import logging
 LOGGER = logging.getLogger("PYWPS")
@@ -87,8 +80,6 @@ class RunNAMEstandard(Process):
                 raise InvalidParameterValue(
                     'The value "{}" does not contain a "-" character to define a range, '
                     'e.g. 0-100'.format(elevationrange.data))
-
-        # Might want to change the elevation input to something similar to this as well so we don't have three separate params
 
         params = dict()
         for p in request.inputs:

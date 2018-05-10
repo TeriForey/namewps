@@ -1,19 +1,11 @@
 from pywps import Process
-from pywps import ComplexInput, ComplexOutput, Format
+from pywps import ComplexOutput, Format
 from pywps import LiteralInput, LiteralOutput, BoundingBoxInput
 from pywps.exceptions import InvalidParameterValue
 from pywps.app.Common import Metadata
 
 from testbird.run_name import run_name
 
-from testbird.write_inputfile import generate_inputfile
-from testbird.write_scriptfile import write_file
-from testbird.utils import daterange
-
-from datetime import datetime, timedelta
-import os
-import stat
-import shutil
 
 import logging
 LOGGER = logging.getLogger("PYWPS")
@@ -62,7 +54,7 @@ class RunNAME(Process):
             LiteralInput('elevationOut', 'Elevation averaging ranges', data_type='string',
                          abstract='Elevation range where the particle number is counted (m agl)'
                                   " Example: 0-100",
-                         default='0-100', min_occurs=1, max_occurs=4), # I want ranges, so going to use string format then process the results.
+                         default='0-100', min_occurs=1, max_occurs=4),
             LiteralInput('resolution','Resolution', data_type='float',
                          abstract='degrees, note the UM global Met data was only 17Km resolution',
                          allowed_values=[0.05,0.25], default=0.25, min_occurs=0),
@@ -122,17 +114,6 @@ class RunNAME(Process):
         for val in request.inputs['domain'][0].data:
             ## Values appear to be coming in as minY, minX, maxY, maxX
             domains.append(float(val))
-
-        # Process the string of domains into a list of floats.
-        # domains = []
-        # if ',' not in request.inputs['domain'][0].data:
-        #     raise InvalidParameterValue("The domain coordinates must be split using a ','")
-        # for val in request.inputs['domain'][0].data.split(','):
-        #     domains.append(float(val))
-        # if len(domains) != 4:
-        #     raise InvalidParameterValue("There must be four coordinates entered, minX,maxX,minY,maxY")
-
-        # Might want to change the elevation input to something similar to this as well so we don't have three separate params
 
         params = dict()
         for p in request.inputs:
