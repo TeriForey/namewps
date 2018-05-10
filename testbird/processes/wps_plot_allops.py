@@ -80,7 +80,7 @@ class PlotAll(Process):
         for p in request.inputs:
             if p == "timestamp" or p == "filelocation" or p == "summarise":
                 continue
-            if p == 'station':
+            if p == 'station' or p == 'lon_bounds' or p == 'lat_bounds':
                 statcoords = request.inputs[p][0].data.split(',')
                 plotoptions[p] = (statcoords[0].strip(), statcoords[1].strip())
             else:
