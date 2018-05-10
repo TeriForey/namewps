@@ -1,5 +1,5 @@
 from pywps import Process
-from pywps import ComplexInput, ComplexOutput, Format
+from pywps import ComplexInput, ComplexOutput, Format, FORMATS
 from pywps import LiteralInput, LiteralOutput, BoundingBoxInput
 from pywps.exceptions import InvalidParameterValue
 from pywps.app.Common import Metadata
@@ -46,14 +46,15 @@ class PlotAll(Process):
             LiteralInput('lat_bounds', 'Latitudinal boundary', data_type='string',
                          abstract='Min and Max latitude boundary', min_occurs=0),
             LiteralInput('scale', 'Particle concentration scale', data_type='string',
-                         abstract='Particle concentration scale (Min,Max)', default="5.e-9, 1.e-5"),
+                         abstract='Particle concentration scale (Min,Max). If no value is set, it will autoscale',
+                         min_occurs=0),
             LiteralInput('colormap', 'Matplotlib colour map', data_type='string',
-                         abstract='Color map name', default='rainbow'),
+                         abstract='Color map name', default='rainbow', min_occurs=0),
             ]
         outputs = [
-            ComplexOutput('FileContents', 'All plot files (zipped)',
-                          abstract="All plot files (zipped)",
-                          supported_formats=[Format('application/x-zipped-shp')],
+            ComplexOutput('FileContents', 'Plot file(s)',
+                          abstract="Plot files",
+                          supported_formats=[Format('application/x-zipped-shp'), Format('image/tiff')],
                           as_reference=True),
             # ComplexOutput('SinglePlot', 'A single output plot',
             #               abstract='One output plot',
@@ -161,16 +162,22 @@ class PlotAll(Process):
                             for column in n.timestamps:
                                 drawMap(n, column, **plotoptions)
 
+        # Outputting different response based on the number of plots generated
         if not os.path.exists(plotoptions['outdir']):
             LOGGER.debug("Did not create any plots")
             response.outputs['FileContents'].data = "No plots created"
         else:
-            zippedfile = "plots"
-            shutil.make_archive(zippedfile, 'zip', plotoptions['outdir'])
-
-            LOGGER.debug("Zipped file: %s (%s bytes)" % (zippedfile+'.zip', os.path.getsize(zippedfile+'.zip')))
-
-            response.outputs['FileContents'].file = zippedfile + '.zip'
+            if len(os.listdir(plotoptions['outdir'])) == 1:
+                LOGGER.debug("Only one output plot")
+                #response.outputs['FileContents'].data_format = FORMATS.GEOTIFF
+                response.outputs['FileContents'].file = os.path.join(plotoptions['outdir'],
+                                                                     os.listdir(plotoptions['outdir'])[0])
+            else:
+                zippedfile = "plots"
+                shutil.make_archive(zippedfile, 'zip', plotoptions['outdir'])
+                LOGGER.debug("Zipped file: %s (%s bytes)" % (zippedfile+'.zip', os.path.getsize(zippedfile+'.zip')))
+                response.outputs['FileContents'].data_format = FORMATS.SHP
+                response.outputs['FileContents'].file = zippedfile + '.zip'
 
         response.update_status("done", 100)
         return response
