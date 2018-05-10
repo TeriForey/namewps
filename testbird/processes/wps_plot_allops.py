@@ -47,6 +47,8 @@ class PlotAll(Process):
                          abstract='Min and Max latitude boundary', min_occurs=0),
             LiteralInput('scale', 'Particle concentration scale', data_type='string',
                          abstract='Particle concentration scale (Min,Max)', default="5.e-9, 1.e-5"),
+            LiteralInput('colormap', 'Matplotlib colour map', data_type='string',
+                         abstract='Color map name', default='rainbow'),
             ]
         outputs = [
             ComplexOutput('FileContents', 'All plot files (zipped)',
@@ -67,6 +69,7 @@ class PlotAll(Process):
             version='0.1',
             metadata=[
                 Metadata('NAME-on-JASMIN guide', 'http://jasmin.ac.uk/jasmin-users/stories/processing/'),
+                Metadata('Colour maps', 'https://matplotlib.org/users/colormaps.html'),
             ],
             inputs=inputs,
             outputs=outputs,
