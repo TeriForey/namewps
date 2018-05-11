@@ -11,7 +11,7 @@ from testbird.processes.wps_name_standard import RunNAMEstandard
 def test_wps_name_standard():
     client = client_for(Service(processes=[RunNAMEstandard()]))
     datainputs = "title={};runBackwards={};time={};elevationOut={};resolution={};startdate={};enddate={}".format(
-        "CAPEVERDE",
+        "Cape Verde",
         "true",
         "1",
         "0-100",

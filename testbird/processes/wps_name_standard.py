@@ -22,7 +22,7 @@ class RunNAMEstandard(Process):
         inputs = [
             LiteralInput('title', 'Release Station', data_type='string',
                          abstract="Weather station of release",
-                         allowed_values=['CAPEVERDE','BEIJING']),
+                         allowed_values=['Cape Verde','Beijing Tower', 'Beijing Pinggu']),
             LiteralInput('runBackwards', 'Run Backwards', data_type='boolean',
                          abstract = 'Whether to run backwards in time (default) or forwards',
                          default = '1', min_occurs=0),
@@ -88,14 +88,41 @@ class RunNAMEstandard(Process):
             else:
                 params[p] = request.inputs[p][0].data
 
-        if params['title'] == "CAPEVERDE":
+        if params['title'] == "Cape Verde":
             params['longitude'] = -24.867222
             params['latitude'] = 16.863611
             params['domain'] = [-30.0, -120.0, 90.0, 80.0] # minY,minX,maxY,maxX
-        elif params['title'] == "BEIJING":
-            params['longitude'] = 100.9
-            params['latitude'] = 36.28
-            params['domain'] = [-10.0, 30.0, 80.0, 170.0]
+        elif params['title'] == "Beijing Tower":
+            params['longitude'] = 116.377
+            params['latitude'] = 39.975
+            if params['time'] == 1:
+                params['domain'] = [-10.0, 40.0, 80.0, 180.0]
+            elif params['time'] == 5:
+                params['domain'] = [-10.0, 10.0, 90.0, 180.0]
+            elif params['time'] == 10:
+                params['domain'] = [-10.0, -60.0, 90.0, 180.0]
+        elif params['title'] == 'Halley':
+            params['longitude'] = 26.16667
+            params['latitude'] = -75.58333
+        elif params['title'] == 'Weybourne':
+            params['longitude'] = 1.1219
+            params['latitude'] = 52.9503
+        elif params['title'] == 'North Kensington':
+            params['longitude'] = -0.154988
+            params['latitude'] = 51.522398
+        elif params['title'] == 'Penlee (PML)':
+            params['longitude'] = -4.1931
+            params['latitude'] = 50.3189
+        elif params['title'] == 'Beijing Pinggu':
+            params['longitude'] = 117.0406996
+            params['latitude'] = 40.1659
+            if params['time'] == 1:
+                params['domain'] = [-10.0, 40.0, 80.0, 180.0]
+            elif params['time'] == 5:
+                params['domain'] = [-10.0, 10.0, 90.0, 180.0]
+            elif params['time'] == 10:
+                params['domain'] = [-10.0, -60.0, 90.0, 180.0]
+
 
         params['elevation'] = 10
         params['timeFmt'] = "days"
