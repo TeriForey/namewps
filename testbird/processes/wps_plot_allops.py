@@ -24,27 +24,27 @@ class PlotAll(Process):
     """
     def __init__(self):
         inputs = [
-            LiteralInput('filelocation', 'Output file location', data_type='string',
+            LiteralInput('filelocation', 'NAME output location', data_type='string',
                          abstract="Run ID that identifies the output file locations"),
-            LiteralInput('timestamp', 'Plot specific timestamp', data_type='dateTime',
-                         abstract="Plot only a specific date and time. Excludes the creation of summary plots",
+            LiteralInput('summarise', 'Summarise data', data_type='string',
+                         abstract='Plot summaries of each day/week/month',
+                         allowed_values=['NA', 'day', 'week', 'month', 'all'], default='NA'),
+            LiteralInput('timestamp', 'Plot specific date and time', data_type='dateTime',
+                         abstract="Plot only a specific date and time. Excludes the creation of summary plots. Format: YYYY-MM-DD HH:MM",
                          min_occurs=0),
-            LiteralInput('summarise', 'Summarise by', data_type='string',
-                         abstract='Plot summaries of each day/week/month/year',
-                         allowed_values=['NA', 'day', 'week', 'month', 'year', 'all'], default='NA'),
             LiteralInput('station', 'Release location', data_type='string',
-                         abstract='Location of release (X, Y)', min_occurs=0),
-            LiteralInput('projection', 'Plot projection', data_type='string',
+                         abstract='Mark the location of release onto the image. Format: longitude,latitude', min_occurs=0),
+            LiteralInput('projection', 'Projection', data_type='string',
                          abstract='Map projection', allowed_values=['cyl', 'npstere', 'spstere'], min_occurs=0),
             LiteralInput('lon_bounds', 'Longitudinal boundary', data_type='string',
-                         abstract='Min and Max longitude to plot (Min,Max)', min_occurs=0),
+                         abstract='X-axis: Min and Max longitude to plot. Format: Min,Max', min_occurs=0),
             LiteralInput('lat_bounds', 'Latitudinal boundary', data_type='string',
-                         abstract='Min and Max latitude boundary', min_occurs=0),
+                         abstract='Y-axis: Min and Max latitude boundary. Format: Min,Max', min_occurs=0),
             LiteralInput('scale', 'Particle concentration scale', data_type='string',
-                         abstract='Particle concentration scale (Min,Max). If no value is set, it will autoscale',
+                         abstract='Particle concentration scale. If no value is set, it will autoscale. Format: Min,Max',
                          min_occurs=0),
-            LiteralInput('colormap', 'Matplotlib colour map', data_type='string',
-                         abstract='Color map name', default='rainbow', min_occurs=0),
+            LiteralInput('colormap', 'Colour map', data_type='string',
+                         abstract='Matplotlib color map name', default='rainbow', min_occurs=0),
             ]
         outputs = [
             ComplexOutput('FileContents', 'Plot file(s)',
@@ -56,7 +56,7 @@ class PlotAll(Process):
         super(PlotAll, self).__init__(
             self._handler,
             identifier='plotall',
-            title='Plot NAME results - advanced',
+            title='Plot NAME results - Concentration',
             abstract="PNG plots are generated from the NAME output files",
             version='0.1',
             metadata=[
@@ -84,6 +84,9 @@ class PlotAll(Process):
                     plotoptions[p] = (float(minscale), float(maxscale))
             else:
                 plotoptions[p] = request.inputs[p][0].data
+
+        if 'timestamp' in request.inputs:
+            request.inputs['summarise'][0].data = 'NA'
 
         s = Sum(request.inputs['filelocation'][0].data)
 
