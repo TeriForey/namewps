@@ -49,7 +49,10 @@ class PlotAll(Process):
         outputs = [
             ComplexOutput('FileContents', 'Plot file(s)',
                           abstract="Plot files",
-                          supported_formats=[Format('application/x-zipped-shp'), FORMATS.GEOTIFF],
+                          supported_formats=[Format('application/x-zipped-shp'),
+                                             Format('text/plain'),
+                                             Format('image/png'),
+                                             FORMATS.GEOTIFF],
                           as_reference=True),
             ]
 
@@ -147,11 +150,12 @@ class PlotAll(Process):
         # Outputting different response based on the number of plots generated
         if not os.path.exists(plotoptions['outdir']):
             LOGGER.debug("Did not create any plots")
-            response.outputs['FileContents'].data = "No plots created"
+            response.outputs['FileContents'].data_format = FORMATS.TEXT
+            response.outputs['FileContents'].data = "No plots created, check input options"
         else:
             if len(os.listdir(plotoptions['outdir'])) == 1:
                 LOGGER.debug("Only one output plot")
-                response.outputs['FileContents'].data_format = FORMATS.GEOTIFF
+                response.outputs['FileContents'].data_format = Format('image/png')
                 response.outputs['FileContents'].file = os.path.join(plotoptions['outdir'],
                                                                      os.listdir(plotoptions['outdir'])[0])
             else:

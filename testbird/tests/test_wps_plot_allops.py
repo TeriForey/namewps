@@ -89,3 +89,16 @@ def test_wps_plot_allops_allsum():
         datainputs=datainputs)
     assert_response_success(resp)
 
+
+@pytest.mark.online
+def test_wps_plot_allops_noplotcreated():
+    client = client_for(Service(processes=[PlotAll()]))
+    datainputs = "filelocation={};timestamp={}".format(
+        "/home/t/trf5/birdhouse/testoutputs/BCK_3-hourly_CAPEVERDE/Outputs",
+        "2018-05-12 13:00"
+    )
+    resp = client.get(
+        service='wps', request='execute', version='1.0.0',
+        identifier='plotall',
+        datainputs=datainputs)
+    assert_response_success(resp)
