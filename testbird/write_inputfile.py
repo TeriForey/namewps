@@ -150,7 +150,7 @@ Name,                      nt,     dt,               t0,""")
 Temporal Grids:
 Name,                      nt,     dt,               t0,
 TGrid1,              1,  {}:00,   {},
-""".format(params['dailyreleaselen'], dt.datetime.strftime(cur_date - dt.timedelta(days=params['time']), '%d/%m/%Y %H:%M')))
+""".format(str(params['dailyreleaselen']).zfill(2), dt.datetime.strftime(cur_date - dt.timedelta(days=params['time']), '%d/%m/%Y %H:%M')))
 
     coordsstrings.append("""
 Domains:
@@ -178,7 +178,7 @@ def generate_inputfile(params, rundate):
     if params['timestamp'] == '3-hourly':
         SamplingPeriod_Hours = 3 # Is this specific to running it 3-hourly??
     else:
-        SamplingPeriod_Hours = 24
+        SamplingPeriod_Hours = params['dailyreleaselen']
 
     backwards = "No"
     runtype = "FWD"
@@ -289,6 +289,9 @@ Max # Particles,   Max # Full Particles, Skew Time, Velocity Memory Time, Mesosc
 
         hour_stop = hour_stop + SamplingPeriod_Hours
         hour_start = hour_start + SamplingPeriod_Hours
+
+        if params['timestamp'] == 'daily':
+            break
 
 
     if not os.path.exists(MetDeclnFile):
