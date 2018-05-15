@@ -144,13 +144,13 @@ Name,                      nt,     dt,               t0,""")
 
 
     else:
-        runDuration = maxagehours + 24
+        runDuration = maxagehours + params['dailyreleaselen']
         params['runDuration'] = runDuration
         coordsstrings.append("""
 Temporal Grids:
 Name,                      nt,     dt,               t0,
-TGrid1,              1,  24:00,   {},
-""".format(dt.datetime.strftime(cur_date - dt.timedelta(days=params['time']), '%d/%m/%Y %H:%M')))
+TGrid1,              1,  {}:00,   {},
+""".format(params['dailyreleaselen'], dt.datetime.strftime(cur_date - dt.timedelta(days=params['time']), '%d/%m/%Y %H:%M')))
 
     coordsstrings.append("""
 Domains:
