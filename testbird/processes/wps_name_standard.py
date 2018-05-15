@@ -22,7 +22,16 @@ class RunNAMEstandard(Process):
         inputs = [
             LiteralInput('title', 'Release Station', data_type='string',
                          abstract="Weather station of release",
-                         allowed_values=['Cape Verde','Beijing Tower', 'Beijing Pinggu']),
+                         allowed_values=[
+                            'Cape Verde',
+                            'Beijing Tower',
+                            'Beijing Pinggu',
+                            'Delhi - Kashmere gate',
+                            'Halley',
+                            'Weybourne',
+                            'BT Tower (150m)',
+                            'North Kensington',
+                            'Penlee (PML)']),
             LiteralInput('runBackwards', 'Run Backwards', data_type='boolean',
                          abstract = 'Whether to run backwards in time (default) or forwards',
                          default = '1', min_occurs=0),
@@ -88,6 +97,10 @@ class RunNAMEstandard(Process):
             else:
                 params[p] = request.inputs[p][0].data
 
+        params['elevation'] = 10
+        params['timeFmt'] = "days"
+        params['timestamp'] = '3-hourly'
+
         if params['title'] == "Cape Verde":
             params['longitude'] = -24.867222
             params['latitude'] = 16.863611
@@ -104,15 +117,19 @@ class RunNAMEstandard(Process):
         elif params['title'] == 'Halley':
             params['longitude'] = 26.16667
             params['latitude'] = -75.58333
+            params['domain'] = [-90.0, -179.875, 0.0, 179.9]
         elif params['title'] == 'Weybourne':
             params['longitude'] = 1.1219
             params['latitude'] = 52.9503
+            params['domain'] = [20.0, -140.0, 90.0, 90.0]
         elif params['title'] == 'North Kensington':
             params['longitude'] = -0.154988
             params['latitude'] = 51.522398
+            params['domain'] = [20.0, -140.0, 90.0, 90.0]
         elif params['title'] == 'Penlee (PML)':
             params['longitude'] = -4.1931
             params['latitude'] = 50.3189
+            params['domain'] = [20.0, -100.0, 90.0, 80.0]
         elif params['title'] == 'Beijing Pinggu':
             params['longitude'] = 117.0406996
             params['latitude'] = 40.1659
@@ -122,11 +139,16 @@ class RunNAMEstandard(Process):
                 params['domain'] = [-10.0, 10.0, 90.0, 180.0]
             elif params['time'] == 10:
                 params['domain'] = [-10.0, -60.0, 90.0, 180.0]
+        elif params['title'] == 'BT Tower (150m)':
+            params['longitude'] = -0.13888
+            params['latitude'] = 51.5215
+            params['domain'] = [20.0, -140.0, 90.0, 90.0]
+            params['elevation'] = 150
+        elif params['title'] == 'Delhi - Kashmere gate':
+            params['longitude'] = 77.23184
+            params['latitude'] = 28.6644
+            params['domain'] = [-20.0, 0.0, 60.0, 180.0]
 
-
-        params['elevation'] = 10
-        params['timeFmt'] = "days"
-        params['timestamp'] = '3-hourly'
 
         outdir, zippedfile, mapfile = run_name(params)
 
