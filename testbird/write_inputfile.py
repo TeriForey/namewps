@@ -200,7 +200,7 @@ def generate_inputfile(params, rundate):
 
     cur_date = dt.datetime.combine(rundate, dt.time(0))
     if 'dailytime' in params and params['timestamp'] == 'daily':
-        cur_date = dt.datetime.combine(cur_date, params['dailytime'])
+        cur_date = dt.datetime.combine(rundate, params['dailytime'])
 
     start_globalMk = get_Mk_global(cur_date + dt.timedelta(days=1))
     end_globalMK = get_Mk_global(cur_date - dt.timedelta(days=params['time']))

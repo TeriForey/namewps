@@ -5,7 +5,6 @@ def write_file(params):
     """
     This will write the shell script file that will be used on JASMIN to run NAME
     :param params: the input parameters from the WPS process
-    :param cur_date: the current running date
     :return: a string of file contents
     """
 
@@ -70,12 +69,6 @@ def write_file(params):
     lines.append("\techo 'Running NAME on ${filename}'")
     lines.append("\techo '=============================='")
     lines.append("\t${NAMEIIIDIR}/Executables_Linux/nameiii_64bit_par.exe  ${filename}")
-
-    # Rename output files
-
-    # lines.append("\t# rename each file by start_date so dont overwrite")
-    # for groupnum in range(1,len(params['elevationOut'])+1):
-    #     lines.append("\tcp -f ${WORKDIR}/group%s_* ${WORKDIR}/group_%s_${filename}" % (groupnum, groupnum))
 
     # Exit loop
 
