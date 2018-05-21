@@ -91,7 +91,8 @@ class PlotAll(Process):
         if 'timestamp' in request.inputs:
             request.inputs['summarise'][0].data = 'NA'
 
-        s = Sum(request.inputs['filelocation'][0].data)
+        if request.inputs['summarise'][0].data != 'NA':
+            s = Sum(request.inputs['filelocation'][0].data)
 
         LOGGER.debug("Plot options: %s" % plotoptions)
 
@@ -143,6 +144,7 @@ class PlotAll(Process):
                             LOGGER.debug("Reformatted time: %s" % timestamp)
                             if timestamp in n.timestamps:
                                 drawMap(n, timestamp, **plotoptions)
+                                break
                         else:
                             for column in n.timestamps:
                                 drawMap(n, column, **plotoptions)
