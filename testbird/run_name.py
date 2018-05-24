@@ -59,7 +59,7 @@ def run_name(params):
     # TODO: Need to trim directory name, report only user/run specific details
 
     # Zip all the output files into one directory to be served back to the user.
-    zippedfile = "{}_{}_{}".format(runtype, params['timestamp'], params['title'])
+    zippedfile = "{}{}_{}_{}".format(runtype, params['time'], params['timestamp'], params['title'])
     shutil.make_archive(zippedfile, 'zip', outputdir)
 
     return outputdir, zippedfile, mapfile
