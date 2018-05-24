@@ -27,6 +27,10 @@ class RunNAMEstandard(Process):
                             'Beijing Tower',
                             'Beijing Pinggu',
                             'Delhi - Kashmere gate',
+                            'Bachok, Malaysia',
+                            'Cape Fuguei, Taiwan',
+                            'Ho Chi Minh City, Vietnam',
+                            'Hanoi, Vietnam',
                             'Halley',
                             'Weybourne',
                             'BT Tower (150m)',
@@ -37,7 +41,7 @@ class RunNAMEstandard(Process):
                          default = '1', min_occurs=0),
             LiteralInput('time', 'Time to run model over', data_type='integer',
                          abstract = 'Number of days model will run over',
-                         allowed_values=[1,5,10], default=1, min_occurs=0),
+                         allowed_values=[1,5,10,12], default=1, min_occurs=0),
             LiteralInput('elevationOut', 'Elevation averaging ranges', data_type='string',
                          abstract='Elevation range where the particle number is counted (m agl)'
                                   " Example: 0-100",
@@ -148,7 +152,22 @@ class RunNAMEstandard(Process):
             params['longitude'] = 77.23184
             params['latitude'] = 28.6644
             params['domain'] = [-20.0, 0.0, 60.0, 180.0]
-
+        elif params['title'] == "Bachok, Malaysia":
+            params['longitude'] = 102.425
+            params['latitude'] = 6.009
+            params['domain'] = [-45.0, 65.0, 80.0, 195.0]
+        elif params['title'] == 'Cape Fuguei, Taiwan':
+            params['longitude'] = 121.538
+            params['latitude'] = 25.297
+            params['domain'] = [-45.0, 65.0, 80.0, 195.0]
+        elif params['title'] == 'Ho Chi Minh City, Vietnam':
+            params['longitude'] = 106.4057
+            params['latitude'] = 10.4544
+            params['domain'] = [-45.0, 65.0, 80.0, 195.0]
+        elif params['title'] == 'Hanoi, Vietnam':
+            params['longitude'] = 105.4902
+            params['latitude'] = 21.0024
+            params['domain'] = [-45.0, 65.0, 80.0, 195.0]
 
         outdir, zippedfile, mapfile = run_name(params)
 
