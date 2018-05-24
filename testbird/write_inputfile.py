@@ -191,7 +191,7 @@ def generate_inputfile(params, rundate):
     jasminconfigs = getjasminconfigs()
 
     userdir = jasminconfigs.get('jasmin', 'userdir')
-    workdir = os.path.join(userdir, 'WPStest', "{}_{}_{}".format(runtype, params['timestamp'], params['title']))
+    workdir = os.path.join(userdir, 'WPStest', "{}{}_{}_{}".format(runtype, params['time'], params['timestamp'], params['title']))
 
     utilsdir = jasminconfigs.get('jasmin', 'utilsdir')
     namedir = jasminconfigs.get('jasmin', 'namedir')

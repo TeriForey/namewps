@@ -15,7 +15,8 @@ def write_file(params):
     jasminconfigs = getjasminconfigs()
 
     userdir = jasminconfigs.get('jasmin', 'userdir')
-    workdir = os.path.join(userdir, 'WPStest', "{}_{}_{}".format(runtype, params['timestamp'], params['title']))
+    workdir = os.path.join(userdir, 'WPStest',
+                           "{}{}_{}_{}".format(runtype, params['time'], params['timestamp'], params['title']))
     namedir = jasminconfigs.get('jasmin', 'namedir')
     topodir = jasminconfigs.get('jasmin', 'topodir')
     metdir = os.path.join(userdir, 'met_data')
