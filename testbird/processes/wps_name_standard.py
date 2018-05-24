@@ -26,7 +26,7 @@ class RunNAMEstandard(Process):
                             'Cape Verde',
                             'Beijing Tower',
                             'Beijing Pinggu',
-                            'Delhi - Kashmere gate',
+                            'Delhi, Kashmere gate',
                             'Bachok, Malaysia',
                             'Cape Fuguei, Taiwan',
                             'Ho Chi Minh City, Vietnam',
@@ -148,7 +148,7 @@ class RunNAMEstandard(Process):
             params['latitude'] = 51.5215
             params['domain'] = [20.0, -140.0, 90.0, 90.0]
             params['elevation'] = 150
-        elif params['title'] == 'Delhi - Kashmere gate':
+        elif params['title'] == 'Delhi, Kashmere gate':
             params['longitude'] = 77.23184
             params['latitude'] = 28.6644
             params['domain'] = [-20.0, 0.0, 60.0, 180.0]

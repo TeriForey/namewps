@@ -17,7 +17,10 @@ def run_name(params):
     """
 
     # replace any white space in title with underscores
-    params['title'] = params['title'].replace(" ", "_")
+    params['title'] = params['title'].replace(' ', '_')
+    params['title'] = params['title'].replace(',', '')
+    params['title'] = params['title'].replace('(', '')
+    params['title'] = params['title'].replace(')', '')
 
     runtype = "FWD"
     if params['runBackwards']:
@@ -27,7 +30,7 @@ def run_name(params):
 
     # TODO: Need to pull in jasmin config file and set the output dir accordingly
     outputdir = os.path.join(jasconfigs.get('jasmin', 'outputdir'),
-                             "{}_{}_{}".format(runtype, params['timestamp'], params['title']))
+                             "{}{}_{}_{}".format(runtype, params['time'], params['timestamp'], params['title']))
     if not os.path.exists(outputdir):
         os.makedirs(outputdir)
     # Will loop through all the dates in range, including the final day
