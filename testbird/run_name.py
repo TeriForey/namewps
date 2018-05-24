@@ -16,6 +16,9 @@ def run_name(params):
     :return: names of the output dir and zipped file
     """
 
+    # replace any white space in title with underscores
+    params['title'] = params['title'].replace(" ", "_")
+
     runtype = "FWD"
     if params['runBackwards']:
         runtype = "BCK"
