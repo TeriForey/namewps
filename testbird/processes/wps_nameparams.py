@@ -134,6 +134,15 @@ class RunNAME(Process):
         if (params['enddate'] + timedelta(days=1)) - params['startdate'] >= timedelta(days=93):
             raise InvalidParameterValue("Can only run across a maximum of three months in one go")
 
+        # Need to test we don't run too far backwards/forwards
+        if params['timeFmt'] == "days":
+            if params['time'] > 30:
+                raise InvalidParameterValue("Can only run NAME over a maximum of 30 days forwards/backwards")
+        else:
+            if params['time'] > 30 * 24:
+                raise InvalidParameterValue("Can only run NAME over a maximum of 30 days forwards/backwards")
+
+
         outdir, zippedfile, mapfile = run_name(params)
 
         response.outputs['FileContents'].file = zippedfile + '.zip'
