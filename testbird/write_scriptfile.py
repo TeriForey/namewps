@@ -22,8 +22,8 @@ def write_file(params, maxruns):
 
     lines.append("#!/bin/bash")
     lines.append("#BSUB -q short-serial")
-    lines.append("#BSUB -o run-%I.out")
-    lines.append("#BSUB -e run-%I.err")
+    lines.append("#BSUB -oo run-%I.out")
+    lines.append("#BSUB -eo run-%I.err")
     lines.append("#BSUB -W 03:00")
     lines.append('#BSUB -R "rusage[mem=8000]"')
     lines.append("#BSUB -M 8000000")
@@ -51,7 +51,7 @@ def write_file(params, maxruns):
     # Run NAME
 
     lines.append("echo '=============================='")
-    lines.append("echo 'Running NAME on ${LSB_JOBINDEX}'")
+    lines.append('echo "Running NAME on input ${LSB_JOBINDEX}"')
     lines.append("echo '=============================='")
     lines.append("${NAMEIIIDIR}/Executables_Linux/nameiii_64bit_par.exe  inputs/input${LSB_JOBINDEX}.txt")
 
