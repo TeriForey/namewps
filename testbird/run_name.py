@@ -35,8 +35,10 @@ def run_name(params):
     if not os.path.exists(params['outputdir']):
         os.makedirs(params['outputdir'])
         os.makedirs(os.path.join(params['outputdir'], 'inputs'))
+        os.makedirs(os.path.join(params['outputdir'], 'outputs'))
     # Will loop through all the dates in range, including the final day
     for i, cur_date in enumerate(daterange(params['startdate'], params['enddate'] + timedelta(days=1))):
+        os.makedirs(os.path.join(params['outputdir'], 'met_data', "input{}".format(i+1)))
         with open(os.path.join(params['outputdir'], "inputs", "input{}.txt".format(i+1)), 'w') as fout:
             fout.write(generate_inputfile(params, cur_date, i+1))
 

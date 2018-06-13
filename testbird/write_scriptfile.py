@@ -9,18 +9,12 @@ def write_file(params, maxruns):
     :return: a string of file contents
     """
 
-    runtype = "FWD"
-    if params['runBackwards']:
-        runtype = "BCK"
-
     jasminconfigs = getjasminconfigs()
 
     userdir = jasminconfigs.get('jasmin', 'userdir')
     workdir = os.path.join(userdir, 'WPStest', params['runid'])
     namedir = jasminconfigs.get('jasmin', 'namedir')
     topodir = jasminconfigs.get('jasmin', 'topodir')
-    metdir = os.path.join(userdir, 'met_data', 'input${LSB_JOBINDEX}')
-    storedir = os.path.join(workdir, "outputs")
 
     lines = []
 
@@ -44,21 +38,13 @@ def write_file(params, maxruns):
 
     # Then we set the directories
 
-    lines.append("SCRIPTDIR=$PWD")
     lines.append("NAMEIIIDIR='{}'".format(namedir))
     lines.append("TOPOGDIR='{}'".format(topodir))
-    lines.append("METDIR='{}'".format(metdir))
     lines.append("WORKDIR='{}'".format(workdir))
-    lines.append("STOREDIR='{}'".format(storedir))
 
-    # Create the new directories
 
-    lines.append("# Create working directory for NAME runs")
-    lines.append("mkdir -p ${WORKDIR}")
-    lines.append("# Create store directory for NAME runs")
-    lines.append("mkdir -p ${STOREDIR}")
-    lines.append("# Create local met directory")
-    lines.append("mkdir -p ${METDIR}")
+    # Move to correct directory
+
     lines.append("# Switch to working directory")
     lines.append("cd ${WORKDIR}")
 
