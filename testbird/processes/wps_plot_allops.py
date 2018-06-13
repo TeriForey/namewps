@@ -2,6 +2,7 @@ from pywps import Process
 from pywps import ComplexOutput, Format, FORMATS
 from pywps import LiteralInput
 from pywps.app.Common import Metadata
+from pywps.exceptions import InvalidParameterValue
 
 from pynameplot import Name, drawMap, Sum
 from pynameplot.namereader import util
@@ -91,7 +92,7 @@ class PlotAll(Process):
 
         files = glob.glob(request.inputs['filelocation'][0].data + '/*_group*.txt')
         if len(files) == 0:
-            raise Exception("Unable to find any output files. File names must be named '*_group*.txt'")
+            raise InvalidParameterValue("Unable to find any output files. File names must be named '*_group*.txt'")
 
         if 'timestamp' in request.inputs:
             request.inputs['summarise'][0].data = 'NA'
