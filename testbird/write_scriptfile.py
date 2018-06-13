@@ -1,10 +1,11 @@
 import os
 from .utils import getjasminconfigs
 
-def write_file(params):
+def write_file(params, maxruns):
     """
     This will write the shell script file that will be used on JASMIN to run NAME
     :param params: the input parameters from the WPS process
+    :param maxruns: the last run index
     :return: a string of file contents
     """
 
@@ -15,21 +16,33 @@ def write_file(params):
     jasminconfigs = getjasminconfigs()
 
     userdir = jasminconfigs.get('jasmin', 'userdir')
-    workdir = os.path.join(userdir, 'WPStest',
-                           "{}{}_{}_{}".format(runtype, params['time'], params['timestamp'], params['title']))
+    workdir = os.path.join(userdir, 'WPStest', params['runid'])
     namedir = jasminconfigs.get('jasmin', 'namedir')
     topodir = jasminconfigs.get('jasmin', 'topodir')
-    metdir = os.path.join(userdir, 'met_data')
-    storedir = os.path.join(workdir, "output")
+    metdir = os.path.join(userdir, 'met_data', 'input${LSB_JOBINDEX}')
+    storedir = os.path.join(workdir, "outputs")
 
     lines = []
+
+    # First we set the BSUB options
+
+    lines.append("#!/bin/bash")
+    lines.append("#BSUB -q short-serial")
+    lines.append("#BSUB -o run-%I.out")
+    lines.append("#BSUB -e run-%I.err")
+    lines.append("#BSUB -W 03:00")
+    lines.append('#BSUB -R "rusage[mem=8000]"')
+    lines.append("#BSUB -M 8000000")
+    lines.append("#BSUB -J {}[1-{}]".format(params['runid'], maxruns))
+
+    # Then import system environment
 
     lines.append("# Set system variables")
     lines.append(". /etc/profile")
     lines.append("# Load Intel compiler module")
     lines.append("module load intel/13.1")
 
-    # First we set the directories
+    # Then we set the directories
 
     lines.append("SCRIPTDIR=$PWD")
     lines.append("NAMEIIIDIR='{}'".format(namedir))
@@ -49,35 +62,16 @@ def write_file(params):
     lines.append("# Switch to working directory")
     lines.append("cd ${WORKDIR}")
 
-    # Going to loop through each input file
-
-    lines.append('for filename in "$@" ; do')
-
-    # Set input file
-
-    # lines.append("# set input filename for NAME run")
-    # lines.append("input_file='{}Run_{}_{}.txt'".format(runtype, params['title'],
-    #                                                             datetime.strftime(cur_date, "%Y%m%d")))
-    lines.append("\t# copy input file to right location")
-    lines.append("\tcp ${SCRIPTDIR}/${filename} ${filename}")
-    # lines.append("# set error filename for NAME run")
-    # lines.append("error_file='{}Run_{}_{}Error.txt'".format(runtype, params['title'],
-    #                                                           datetime.strftime(cur_date, "%Y%m%d")))
-
     # Run NAME
 
-    lines.append("\techo '=============================='")
-    lines.append("\techo 'Running NAME on ${filename}'")
-    lines.append("\techo '=============================='")
-    lines.append("\t${NAMEIIIDIR}/Executables_Linux/nameiii_64bit_par.exe  ${filename}")
-
-    # Exit loop
-
-    lines.append("done")
+    lines.append("echo '=============================='")
+    lines.append("echo 'Running NAME on ${LSB_JOBINDEX}'")
+    lines.append("echo '=============================='")
+    lines.append("${NAMEIIIDIR}/Executables_Linux/nameiii_64bit_par.exe  inputs/input${LSB_JOBINDEX}.txt")
 
     # Finish
 
-    lines.append("echo 'Script $0 completed'")
+    lines.append("echo 'Script completed'")
     lines.append("# -------------------------------- END -------------------------------")
     lines.append("exit 0")
 

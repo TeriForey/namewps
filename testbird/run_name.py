@@ -1,5 +1,4 @@
 import os
-import stat
 import shutil
 from datetime import timedelta, datetime
 from pynameplot import Name, drawMap
@@ -28,24 +27,25 @@ def run_name(params):
 
     jasconfigs = getjasminconfigs()
 
-    # TODO: Need to pull in jasmin config file and set the output dir accordingly
-    outputdir = os.path.join(jasconfigs.get('jasmin', 'outputdir'),
-                             "{}{}_{}_{}".format(runtype, params['time'], params['timestamp'], params['title']))
-    if not os.path.exists(outputdir):
-        os.makedirs(outputdir)
+    runtime = datetime.strftime(datetime.now(), "%s")
+    params['runid'] = "{}{}_{}_{}_{}".format(runtype, params['time'], params['timestamp'], params['title'], runtime)
+
+    params['outputdir'] = os.path.join(jasconfigs.get('jasmin', 'outputdir'), params['runid'])
+
+    if not os.path.exists(params['outputdir']):
+        os.makedirs(params['outputdir'])
+        os.makedirs(os.path.join(params['outputdir'], 'inputs'))
     # Will loop through all the dates in range, including the final day
-    for cur_date in daterange(params['startdate'],
-                              params['enddate'] + timedelta(days=1)):
-        with open(os.path.join(outputdir, "{}Run_{}_{}.txt".format(runtype, params['title'],
-                                                                   datetime.strftime(cur_date, "%Y%m%d"))),
-                  'w') as fout:
-            fout.write(generate_inputfile(params, cur_date))
+    for i, cur_date in enumerate(daterange(params['startdate'], params['enddate'] + timedelta(days=1))):
+        with open(os.path.join(params['outputdir'], "inputs", "input{}.txt".format(i+1)), 'w') as fout:
+            fout.write(generate_inputfile(params, cur_date, i+1))
 
-    with open(os.path.join(outputdir, 'script.sh'), 'w') as fout:
-        fout.write(write_file(params))
+    with open(os.path.join(params['outputdir'], 'script.bsub'), 'w') as fout:
+        fout.write(write_file(params, i+1))
 
-    st = os.stat(os.path.join(outputdir, 'script.sh'))
-    os.chmod(os.path.join(outputdir, 'script.sh'), st.st_mode | 0111)
+    """
+    We'll insert the commands to run NAME here. 
+    """
 
     """
     Going to 'create' an output file that we will then plot, treating it as though it were an actual result.
@@ -59,7 +59,7 @@ def run_name(params):
     # TODO: Need to trim directory name, report only user/run specific details
 
     # Zip all the output files into one directory to be served back to the user.
-    zippedfile = "{}{}_{}_{}".format(runtype, params['time'], params['timestamp'], params['title'])
-    shutil.make_archive(zippedfile, 'zip', outputdir)
+    zippedfile = params['runid']
+    shutil.make_archive(zippedfile, 'zip', params['outputdir'])
 
-    return outputdir, zippedfile, mapfile
+    return params['runid'], zippedfile, mapfile
