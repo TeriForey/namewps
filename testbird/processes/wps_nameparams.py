@@ -136,11 +136,11 @@ class RunNAME(Process):
 
         # Need to test we don't run too far backwards/forwards
         if params['timeFmt'] == "days":
-            if params['time'] > 30:
-                raise InvalidParameterValue("Can only run NAME over a maximum of 30 days forwards/backwards")
+            if params['time'] > 20:
+                raise InvalidParameterValue("Can only run NAME over a maximum of 20 days forwards/backwards")
         else:
-            if params['time'] > 30 * 24:
-                raise InvalidParameterValue("Can only run NAME over a maximum of 30 days forwards/backwards")
+            if params['time'] > 20 * 24:
+                raise InvalidParameterValue("Can only run NAME over a maximum of 20 days forwards/backwards")
 
 
         outdir, zippedfile, mapfile = run_name(params)

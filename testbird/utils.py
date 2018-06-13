@@ -103,7 +103,7 @@ def estimatereq(time):
         return 'short-serial', '02:00', 16000
     elif time < 15:
         return 'short-serial', '03:00', 32000
-    elif time < 25:
-        return 'short-serial', '05:00', 60000
+    elif time <= 20:
+        return 'short-serial', '04:00', 48000
     else:
         return 'high-mem', '08:00', 90000
