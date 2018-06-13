@@ -1,5 +1,7 @@
 import os
 import shutil
+import subprocess
+import time
 from datetime import timedelta, datetime
 from pynameplot import Name, drawMap
 
@@ -45,13 +47,21 @@ def run_name(params):
     with open(os.path.join(params['outputdir'], 'script.bsub'), 'w') as fout:
         fout.write(write_file(params, i+1))
 
-    """
-    We'll insert the commands to run NAME here. 
-    """
+    # TODO: We'll insert the commands to run NAME here.
+    # cat = subprocess.Popen(['cat', os.path.join(params['outputdir'], 'script.bsub')], stdout=subprocess.PIPE)
+    # runbsub = subprocess.Popen('bsub', stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=cat.stdout)
+    # sout, serr = runbsub.communicate()
+    # jobid = sout.split(' ')[1].replace('>', '').replace('<', '')
+    # jobrunning = True
+    # while jobrunning:
+    #     time.sleep(30)
+    #     checkjob = subprocess.check_output('bjobs')
+    #     if jobid in checkjob:
+    #         print("Job %s is still running" % jobid)
+    #     else:
+    #         jobrunning = False
 
-    """
-    Going to 'create' an output file that we will then plot, treating it as though it were an actual result.
-    """
+    # TODO: Need to replace this with an actual result file
     fakefile = os.path.join(jasconfigs.get('jasmin', 'outputdir'), '20171101_output.txt')
 
     n = Name(fakefile)
