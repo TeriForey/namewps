@@ -127,6 +127,13 @@ class RunNAME(Process):
             else:
                 params[p] = request.inputs[p][0].data
 
+        # Need to test start and end dates make sense relative to each other
+        if params['startdate'] >= params['enddate'] + timedelta(days=1):
+            raise InvalidParameterValue("The end date is earlier than the start date!")
+
+        if (params['enddate'] + timedelta(days=1)) - params['startdate'] >= timedelta(days=93):
+            raise InvalidParameterValue("Can only run across a maximum of three months in one go")
+
         outdir, zippedfile, mapfile = run_name(params)
 
         response.outputs['FileContents'].file = zippedfile + '.zip'

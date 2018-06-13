@@ -5,6 +5,7 @@ from pywps.exceptions import InvalidParameterValue
 from pywps.app.Common import Metadata
 
 from testbird.run_name import run_name
+from datetime import timedelta
 
 import logging
 LOGGER = logging.getLogger("PYWPS")
@@ -100,6 +101,13 @@ class RunNAMEstandard(Process):
                 params[p] = ranges
             else:
                 params[p] = request.inputs[p][0].data
+
+        # Need to test start and end dates make sense relative to each other
+        if params['startdate'] >= params['enddate'] + timedelta(days=1):
+            raise InvalidParameterValue("The end date is earlier than the start date!")
+
+        if (params['enddate'] + timedelta(days=1)) - params['startdate'] >= timedelta(days=93):
+            raise InvalidParameterValue("Can only run across a maximum of three months in one go")
 
         params['elevation'] = 10
         params['timeFmt'] = "days"
