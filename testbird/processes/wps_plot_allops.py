@@ -10,6 +10,7 @@ from datetime import datetime
 import shutil
 import os
 import calendar
+import glob
 
 import logging
 LOGGER = logging.getLogger("PYWPS")
@@ -87,6 +88,10 @@ class PlotAll(Process):
                     plotoptions[p] = (float(minscale), float(maxscale))
             else:
                 plotoptions[p] = request.inputs[p][0].data
+
+        files = glob.glob(request.inputs['filelocation'][0].data + '/*_group*.txt')
+        if len(files) == 0:
+            raise Exception("Unable to find any output files. File names must be named '*_group*.txt'")
 
         if 'timestamp' in request.inputs:
             request.inputs['summarise'][0].data = 'NA'
