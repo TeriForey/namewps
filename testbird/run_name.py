@@ -58,8 +58,6 @@ def run_name(params):
     mapfile = "ExamplePlot.png"
     drawMap(n, n.timestamps[0], outfile=mapfile)
 
-    # TODO: Need to trim directory name, report only user/run specific details
-
     # Zip all the output files into one directory to be served back to the user.
     zippedfile = params['runid']
     shutil.make_archive(zippedfile, 'zip', params['outputdir'])

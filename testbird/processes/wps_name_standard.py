@@ -55,8 +55,8 @@ class RunNAMEstandard(Process):
                          abstract = 'end date of runs (YYYY-MM-DD)')
             ]
         outputs = [
-            LiteralOutput('FileDir', 'Output file directory', data_type='string',
-                          abstract='Location of output files'),
+            LiteralOutput('runid', 'Run ID', data_type='string',
+                          abstract='Unique run identifier, this is needed to create plots'),
             ComplexOutput('FileContents', 'Output files (zipped)',
                           abstract="Output files (zipped)",
                           supported_formats=[Format('application/x-zipped-shp')],
@@ -172,7 +172,7 @@ class RunNAMEstandard(Process):
         outdir, zippedfile, mapfile = run_name(params)
 
         response.outputs['FileContents'].file = zippedfile + '.zip'
-        response.outputs['FileDir'].data = outdir
+        response.outputs['runid'].data = outdir
         response.outputs['ExamplePlot'].file = mapfile
 
         response.update_status("done", 100)
