@@ -94,3 +94,16 @@ def get_Met_vals(Mk):
         d['MetPrefix'] = 'MO'
 
     return d
+
+
+def estimatereq(time):
+    if time < 5:
+        return 'short-serial', '01:00', 8000
+    elif time < 10:
+        return 'short-serial', '02:00', 16000
+    elif time < 15:
+        return 'short-serial', '03:00', 32000
+    elif time < 25:
+        return 'short-serial', '05:00', 60000
+    else:
+        return 'high-mem', '08:00', 90000

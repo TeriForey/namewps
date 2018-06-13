@@ -1,5 +1,6 @@
 import os
 from .utils import getjasminconfigs
+from .utils import estimatereq
 
 def write_file(params, maxruns):
     """
@@ -18,15 +19,19 @@ def write_file(params, maxruns):
 
     lines = []
 
+    queue, walltime, mem = estimatereq(params['time'])
+    if params['timeFmt'] == 'hours':
+        queue, walltime, mem = estimatereq(params['time']/float(24))
+
     # First we set the BSUB options
 
     lines.append("#!/bin/bash")
-    lines.append("#BSUB -q short-serial")
-    lines.append("#BSUB -oo run-%I.out")
-    lines.append("#BSUB -eo run-%I.err")
-    lines.append("#BSUB -W 03:00")
-    lines.append('#BSUB -R "rusage[mem=8000]"')
-    lines.append("#BSUB -M 8000000")
+    lines.append("#BSUB -q {}".format(queue))
+    lines.append("#BSUB -oo r-%J-%I.out")
+    lines.append("#BSUB -eo r-%J-%I.err")
+    lines.append("#BSUB -W {}".format(walltime))
+    lines.append('#BSUB -R "rusage[mem={}]"'.format(mem))
+    lines.append("#BSUB -M {}".format(mem*1000))
     lines.append("#BSUB -J {}[1-{}]".format(params['runid'], maxruns))
 
     # Then import system environment
