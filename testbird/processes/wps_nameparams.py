@@ -146,6 +146,7 @@ class RunNAME(Process):
             if params['time'] > 20 * 24:
                 raise InvalidParameterValue("Can only run NAME over a maximum of 20 days forwards/backwards")
 
+        response.update_status("running NAME", 10)
 
         outdir, zippedfile, mapfile = run_name(params)
 
