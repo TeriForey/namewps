@@ -61,6 +61,12 @@ def run_name(params, response):
     #     checkjob = subprocess.check_output('bjobs')
     #     if jobid in checkjob:
     #         print("Job %s is still running" % jobid)
+    #           processesrunning = 0
+    #           for l in checkjob.split('\n'):
+    #               if jobid in l:
+    #                   processesrunning += 1
+    #           percentcomplete = (((i+1)-processesrunning)/float(i+1))*85
+    #           response.update_status("Running NAME", 10+percentcomplete)
     #     else:
     #         jobrunning = False
 
