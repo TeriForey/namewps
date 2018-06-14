@@ -117,6 +117,10 @@ class RunNAME(Process):
         for val in request.inputs['domain'][0].data:
             ## Values appear to be coming in as minY, minX, maxY, maxX
             domains.append(float(val))
+        # If minX and maxX are 180, need to reset to 179.9
+        if domains[1] == -180 and domains[3] == 180:
+            domains[1] = -179.875
+            domains[3] = 179.9
 
         params = dict()
         for p in request.inputs:
