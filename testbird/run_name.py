@@ -42,7 +42,7 @@ def run_name(params, response):
 
     # Will write a file that lists all the input parameters
     with open(os.path.join(params['outputdir'], 'user_input_parameters.txt'), 'w') as ins:
-        for p in params:
+        for p in sorted(params):
             if p == 'outputdir':
                 continue
             ins.write("%s: %s\n" % (p, params[p]))
