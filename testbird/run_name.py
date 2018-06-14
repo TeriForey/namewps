@@ -39,6 +39,14 @@ def run_name(params, response):
         os.makedirs(params['outputdir'])
         os.makedirs(os.path.join(params['outputdir'], 'inputs'))
         os.makedirs(os.path.join(params['outputdir'], 'outputs'))
+
+    # Will write a file that lists all the input parameters
+    with open(os.path.join(params['outputdir'], 'user_input_parameters.txt'), 'w') as ins:
+        for p in params:
+            if p == 'outputdir':
+                continue
+            ins.write("%s: %s\n" % (p, params[p]))
+
     # Will loop through all the dates in range, including the final day
     for i, cur_date in enumerate(daterange(params['startdate'], params['enddate'] + timedelta(days=1))):
         os.makedirs(os.path.join(params['outputdir'], 'met_data', "input{}".format(i+1)))
