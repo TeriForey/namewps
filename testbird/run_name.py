@@ -10,10 +10,11 @@ from .write_inputfile import generate_inputfile
 from .write_scriptfile import write_file
 
 
-def run_name(params):
+def run_name(params, response):
     """
     This is the function to actually run NAME
     :param params: input parameters
+    :param response: the WPS response object
     :return: names of the output dir and zipped file
     """
 
@@ -47,6 +48,8 @@ def run_name(params):
     with open(os.path.join(params['outputdir'], 'script.bsub'), 'w') as fout:
         fout.write(write_file(params, i+1))
 
+    response.update_status("Input files created", 10)
+
     # TODO: We'll insert the commands to run NAME here.
     # cat = subprocess.Popen(['cat', os.path.join(params['outputdir'], 'script.bsub')], stdout=subprocess.PIPE)
     # runbsub = subprocess.Popen('bsub', stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=cat.stdout)
@@ -60,6 +63,8 @@ def run_name(params):
     #         print("Job %s is still running" % jobid)
     #     else:
     #         jobrunning = False
+
+    response.update_status("NAME simulation finished", 95)
 
     # TODO: Need to replace this with an actual result file
     fakefile = os.path.join(jasconfigs.get('jasmin', 'outputdir'), '20171101_output.txt')

@@ -177,9 +177,9 @@ class RunNAMEstandard(Process):
             params['latitude'] = 21.0024
             params['domain'] = [-45.0, 65.0, 80.0, 195.0]
 
-        response.update_status("running NAME", 10)
+        response.update_status("Processed parameters", 5)
 
-        outdir, zippedfile, mapfile = run_name(params)
+        outdir, zippedfile, mapfile = run_name(params, response)
 
         response.outputs['FileContents'].file = zippedfile + '.zip'
         response.outputs['runid'].data = outdir
