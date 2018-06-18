@@ -47,7 +47,6 @@ def write_file(params, maxruns):
     lines.append("TOPOGDIR='{}'".format(topodir))
     lines.append("WORKDIR='{}'".format(workdir))
 
-
     # Move to correct directory
 
     lines.append("# Switch to working directory")
@@ -59,6 +58,11 @@ def write_file(params, maxruns):
     lines.append('echo "Running NAME on input ${LSB_JOBINDEX}"')
     lines.append("echo '=============================='")
     lines.append("${NAMEIIIDIR}/Executables_Linux/nameiii_64bit_par.exe  inputs/input${LSB_JOBINDEX}.txt")
+
+    # Remove Met files
+
+    lines.append("echo 'Removing met files'")
+    lines.append("rm ${WORKDIR}/met_data/input${LSB_JOBINDEX}/*.*")
 
     # Finish
 
