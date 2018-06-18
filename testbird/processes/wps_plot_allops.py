@@ -12,6 +12,7 @@ import shutil
 import os
 import calendar
 import glob
+from testbird.utils import getjasminconfigs
 
 import logging
 LOGGER = logging.getLogger("PYWPS")
@@ -26,8 +27,8 @@ class PlotAll(Process):
     """
     def __init__(self):
         inputs = [
-            LiteralInput('filelocation', 'NAME output location', data_type='string',
-                         abstract="Run ID that identifies the output file locations"),
+            LiteralInput('filelocation', 'NAME run ID', data_type='string',
+                         abstract="Run ID that identifies the NAME output files"),
             LiteralInput('summarise', 'Summarise data', data_type='string',
                          abstract='Plot summaries of each day/week/month',
                          allowed_values=['NA', 'day', 'week', 'month', 'all'], default='NA'),
@@ -75,9 +76,13 @@ class PlotAll(Process):
 
     def _handler(self, request, response):
 
+        jasconfigs = getjasminconfigs()
+        rundir = os.path.join(jasconfigs.get('jasmin', 'outputdir'), request.inputs['filelocation'][0].data)
+        LOGGER.debug("Working Directory for plots: %s" % rundir)
 
+        # Parse input params into plot options
         plotoptions = {}
-        plotoptions['outdir'] = "Allplots"
+        plotoptions['outdir'] = os.path.join(rundir, "plots")
         for p in request.inputs:
             if p == "timestamp" or p == "filelocation" or p == "summarise":
                 continue
@@ -90,7 +95,7 @@ class PlotAll(Process):
             else:
                 plotoptions[p] = request.inputs[p][0].data
 
-        files = glob.glob(request.inputs['filelocation'][0].data + '/*_group*.txt')
+        files = glob.glob(os.path.join(rundir, 'outputs', '*_group*.txt'))
         if len(files) == 0:
             raise InvalidParameterValue("Unable to find any output files. File names must be named '*_group*.txt'")
 
@@ -98,7 +103,7 @@ class PlotAll(Process):
             request.inputs['summarise'][0].data = 'NA'
 
         if request.inputs['summarise'][0].data != 'NA':
-            s = Sum(request.inputs['filelocation'][0].data)
+            s = Sum(os.path.join(rundir, 'outputs'))
 
         LOGGER.debug("Plot options: %s" % plotoptions)
 
@@ -132,10 +137,10 @@ class PlotAll(Process):
             plotoptions['outfile'] = "{}_summed_all.png".format(s.runname)
             drawMap(s, 'total', **plotoptions)
         else:
-            for filename in os.listdir(request.inputs['filelocation'][0].data):
-                if filename.endswith('.txt'):
+            for filename in os.listdir(os.path.join(rundir, 'outputs')):
+                if '_group' in filename and filename.endswith('.txt'):
                     if request.inputs['summarise'][0].data == 'day':
-                        s = Sum(request.inputs['filelocation'][0].data)
+                        s = Sum(os.path.join(rundir, 'outputs'))
                         date = util.shortname(filename)
                         s.sumDay(date)
                         plotoptions['caption'] = "{} {} {} {}: {}{}{} day sum".format(s.runname, s.averaging,
@@ -144,7 +149,7 @@ class PlotAll(Process):
                         plotoptions['outfile'] = "{}_{}{}{}_daily.png".format(s.runname, s.year, s.month, s.day)
                         drawMap(s, 'total', **plotoptions)
                     elif request.inputs['summarise'][0].data == 'NA':
-                        n = Name(os.path.join(request.inputs['filelocation'][0].data, filename))
+                        n = Name(os.path.join(rundir, 'outputs', filename))
                         if 'timestamp' in request.inputs:
                             timestamp = datetime.strftime(request.inputs['timestamp'][0].data, "%d/%m/%Y %H:%M UTC")
                             LOGGER.debug("Reformatted time: %s" % timestamp)

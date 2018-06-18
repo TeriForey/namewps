@@ -11,7 +11,7 @@ from testbird.processes.wps_plot_allops import PlotAll
 def test_wps_plot_allops_simple():
     client = client_for(Service(processes=[PlotAll()]))
     datainputs = "filelocation={}".format(
-        "/home/t/trf5/birdhouse/testoutputs/BCK_3-hourly_CAPEVERDE/Outputs",
+        "BCK_3-hourly_CAPEVERDE",
     )
     resp = client.get(
         service='wps', request='execute', version='1.0.0',
@@ -24,7 +24,7 @@ def test_wps_plot_allops_simple():
 def test_wps_plot_allops_timestamp():
     client = client_for(Service(processes=[PlotAll()]))
     datainputs = "filelocation={};timestamp={}".format(
-        "/home/t/trf5/birdhouse/testoutputs/BCK_3-hourly_CAPEVERDE/Outputs",
+        "BCK_3-hourly_CAPEVERDE",
         "2017-11-01 12:00"
     )
     resp = client.get(
@@ -38,7 +38,7 @@ def test_wps_plot_allops_timestamp():
 def test_wps_plot_allops_daysum():
     client = client_for(Service(processes=[PlotAll()]))
     datainputs = "filelocation={};summarise={}".format(
-        "/home/t/trf5/birdhouse/testoutputs/BCK_3-hourly_CAPEVERDE/Outputs",
+        "BCK_3-hourly_CAPEVERDE",
         "day"
     )
     resp = client.get(
@@ -52,7 +52,7 @@ def test_wps_plot_allops_daysum():
 def test_wps_plot_allops_weeksum():
     client = client_for(Service(processes=[PlotAll()]))
     datainputs = "filelocation={};summarise={}".format(
-        "/home/t/trf5/birdhouse/testoutputs/BCK_3-hourly_CAPEVERDE/Outputs",
+        "BCK_3-hourly_CAPEVERDE",
         "week"
     )
     resp = client.get(
@@ -66,7 +66,7 @@ def test_wps_plot_allops_weeksum():
 def test_wps_plot_allops_monthsum():
     client = client_for(Service(processes=[PlotAll()]))
     datainputs = "filelocation={};summarise={}".format(
-        "/home/t/trf5/birdhouse/testoutputs/BCK_3-hourly_CAPEVERDE/Outputs",
+        "BCK_3-hourly_CAPEVERDE",
         "month"
     )
     resp = client.get(
@@ -80,7 +80,7 @@ def test_wps_plot_allops_monthsum():
 def test_wps_plot_allops_allsum():
     client = client_for(Service(processes=[PlotAll()]))
     datainputs = "filelocation={};summarise={}".format(
-        "/home/t/trf5/birdhouse/testoutputs/BCK_3-hourly_CAPEVERDE/Outputs",
+        "BCK_3-hourly_CAPEVERDE",
         "all"
     )
     resp = client.get(
@@ -94,7 +94,7 @@ def test_wps_plot_allops_allsum():
 def test_wps_plot_allops_noplotcreated():
     client = client_for(Service(processes=[PlotAll()]))
     datainputs = "filelocation={};timestamp={}".format(
-        "/home/t/trf5/birdhouse/testoutputs/BCK_3-hourly_CAPEVERDE/Outputs",
+        "BCK_3-hourly_CAPEVERDE",
         "2018-05-12 13:00"
     )
     resp = client.get(
