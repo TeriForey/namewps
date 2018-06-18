@@ -22,7 +22,7 @@ class RunNAMEstandard(Process):
     def __init__(self):
         inputs = [
             LiteralInput('title', 'Release Station', data_type='string',
-                         abstract="Weather station of release",
+                         abstract="standard location of release",
                          allowed_values=[
                             'Cape Verde',
                             'Beijing Tower',
@@ -38,12 +38,12 @@ class RunNAMEstandard(Process):
                             'North Kensington',
                             'Penlee (PML)']),
             LiteralInput('runBackwards', 'Run Backwards', data_type='boolean',
-                         abstract = 'Whether to run backwards in time (default) or forwards',
+                         abstract = 'Whether to run backwards in time or forwards',
                          default = '1', min_occurs=0),
-            LiteralInput('time', 'Time to run model over', data_type='integer',
+            LiteralInput('time', 'Run Time', data_type='integer',
                          abstract = 'Number of days model will run over',
                          allowed_values=[1,5,10,12], default=1, min_occurs=0),
-            LiteralInput('elevationOut', 'Elevation averaging ranges', data_type='string',
+            LiteralInput('elevationOut', 'Output elevation averaging ranges', data_type='string',
                          abstract='Elevation range where the particle number is counted (m agl)'
                                   " Example: 0-100",
                          default='0-100', min_occurs=1, max_occurs=4), # I want ranges, so going to use string format then process the results.
@@ -72,7 +72,7 @@ class RunNAMEstandard(Process):
             self._handler,
             identifier='runnamestd',
             title='Run NAME-on-JASMIN - Standard',
-            abstract="Passes input arguments onto NAME",
+            abstract="Run NAME 3-hourly from a choice of standard release locations",
             version='0.1',
             metadata=[
                 Metadata('NAME-on-JASMIN guide', 'http://jasmin.ac.uk/jasmin-users/stories/processing/'),
