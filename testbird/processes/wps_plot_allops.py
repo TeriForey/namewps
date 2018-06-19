@@ -12,6 +12,7 @@ import shutil
 import os
 import calendar
 import glob
+import tempfile
 from testbird.utils import getjasminconfigs
 
 import logging
@@ -33,10 +34,12 @@ class PlotAll(Process):
                          abstract='Plot summaries of each day/week/month',
                          allowed_values=['NA', 'day', 'week', 'month', 'all'], default='NA'),
             LiteralInput('timestamp', 'Plot specific date and time', data_type='dateTime',
-                         abstract="Plot only a specific date and time. Excludes the creation of summary plots. Format: YYYY-MM-DD HH:MM",
+                         abstract="Plot only a specific timestamp. Excludes the creation of summary plots. "
+                                  "Format: YYYY-MM-DD HH:MM",
                          min_occurs=0),
             LiteralInput('station', 'Release location', data_type='string',
-                         abstract='Mark the location of release onto the image. Format: longitude,latitude', min_occurs=0),
+                         abstract='Mark the location of release onto the image. Format: longitude,latitude',
+                         min_occurs=0),
             LiteralInput('projection', 'Projection', data_type='string',
                          abstract='Map projection', allowed_values=['cyl', 'npstere', 'spstere'], min_occurs=0),
             LiteralInput('lon_bounds', 'Longitudinal boundary', data_type='string',
@@ -44,10 +47,12 @@ class PlotAll(Process):
             LiteralInput('lat_bounds', 'Latitudinal boundary', data_type='string',
                          abstract='Y-axis: Min and Max latitude boundary. Format: Min,Max', min_occurs=0),
             LiteralInput('scale', 'Particle concentration scale', data_type='string',
-                         abstract='Particle concentration scale. If no value is set, it will autoscale. Format: Min,Max',
+                         abstract='Particle concentration scale. If no value is set, it will autoscale. '
+                                  'Format: Min,Max',
                          min_occurs=0),
             LiteralInput('colormap', 'Colour map', data_type='string',
-                         abstract='Matplotlib color map name', default='rainbow', min_occurs=0),
+                         abstract='Matplotlib color map name', default='coolwarm', min_occurs=0,
+                         allowed_values=['coolwarm', 'viridis', 'rainbow']),
             ]
         outputs = [
             ComplexOutput('FileContents', 'Plot file(s)',
@@ -102,65 +107,95 @@ class PlotAll(Process):
         if 'timestamp' in request.inputs:
             request.inputs['summarise'][0].data = 'NA'
 
-        if request.inputs['summarise'][0].data != 'NA':
-            s = Sum(os.path.join(rundir, 'outputs'))
-
         LOGGER.debug("Plot options: %s" % plotoptions)
 
-        if request.inputs['summarise'][0].data == 'week':
-            for week in range(1, 53):
-                s.sumWeek(week)
-                if len(s.files) == 0:
-                    LOGGER.debug("No files found for week %s" % week)
-                    continue
-                plotoptions['caption'] = "{} {} {} {}: {} week {} sum (UTC)".format(s.runname, s.averaging, s.altitude,
-                                                                              s.direction, s.year, week)
-                plotoptions['outfile'] = "{}_{}_{}_weekly.png".format(s.runname, s.year, week)
+        response.update_status("Processed plot parameters", 10)
+
+        # We need to find all the groups and loop through them one at a time!
+        groups = {}
+        for filename in os.listdir(os.path.join(rundir, 'outputs')):
+            groupnum = filename[14]
+            try:
+                groupnum = int(groupnum)
+            except:
+                raise Exception("Cannot identify groupnumber %s" % groupnum)
+
+            if groupnum in groups:
+                shutil.copy(os.path.join(rundir, 'outputs', filename), groups[groupnum])
+            else:
+                groups[groupnum] = tempfile.mkdtemp()
+                shutil.copy(os.path.join(rundir, 'outputs', filename), groups[groupnum])
+
+        ngroups = len(groups)
+
+        for groupnum, tmpdir in sorted(groups.items()):
+            if request.inputs['summarise'][0].data != 'NA':
+                s = Sum(tmpdir)
+
+            if request.inputs['summarise'][0].data == 'week':
+                for week in range(1, 53):
+                    s.sumWeek(week)
+                    if len(s.files) == 0:
+                        LOGGER.debug("No files found for week %s" % week)
+                        continue
+                    plotoptions['caption'] = "{} {} {} {}: {} week {} sum (UTC)".format(s.runname, s.averaging,
+                                                                                        s.altitude, s.direction,
+                                                                                        s.year, week)
+                    plotoptions['outfile'] = "{}_{}_{}_{}_weekly.png".format(s.runname, s.altitude.strip('()'),
+                                                                             s.year, week)
+                    drawMap(s, 'total', **plotoptions)
+
+            elif request.inputs['summarise'][0].data == 'month':
+                for month in range(1, 13):
+                    s.sumMonth(str(month))
+                    if len(s.files) == 0:
+                        LOGGER.debug("No files found for month %s" % month)
+                        continue
+                    plotoptions['caption'] = "{} {} {} {}: {} {} sum (UTC)".format(s.runname, s.averaging, s.altitude,
+                                                                             s.direction, s.year,
+                                                                             calendar.month_name[month])
+                    plotoptions['outfile'] = "{}_{}_{}_{}_monthly.png".format(s.runname, s.altitude.strip('()'),
+                                                                              s.year, month)
+                    drawMap(s, 'total', **plotoptions)
+
+            elif request.inputs['summarise'][0].data == 'all':
+                s.sumAll()
+                plotoptions['caption'] = "{} {} {} {}: Summed (UTC)".format(s.runname, s.averaging, s.altitude,
+                                                                            s.direction)
+                plotoptions['outfile'] = "{}_{}_summed_all.png".format(s.runname, s.altitude.strip('()'))
                 drawMap(s, 'total', **plotoptions)
+            else:
+                for filename in os.listdir(tmpdir):
+                    if '_group' in filename and filename.endswith('.txt'):
+                        if request.inputs['summarise'][0].data == 'day':
+                            #s = Sum(tmpdir)
+                            date = util.shortname(filename)
+                            s.sumDay(date)
+                            plotoptions['caption'] = "{} {} {} {}: {}{}{} day sum (UTC)".format(s.runname, s.averaging,
+                                                                                          s.altitude, s.direction,
+                                                                                          s.year, s.month, s.day)
+                            plotoptions['outfile'] = "{}_{}_{}{}{}_daily.png".format(s.runname, s.altitude.strip('()'),
+                                                                                     s.year, s.month, s.day)
+                            drawMap(s, 'total', **plotoptions)
+                        elif request.inputs['summarise'][0].data == 'NA':
+                            n = Name(os.path.join(tmpdir, filename))
+                            if 'timestamp' in request.inputs:
+                                timestamp = datetime.strftime(request.inputs['timestamp'][0].data, "%d/%m/%Y %H:%M UTC")
+                                LOGGER.debug("Reformatted time: %s" % timestamp)
+                                if timestamp in n.timestamps:
+                                    drawMap(n, timestamp, **plotoptions)
+                                    break
+                            else:
+                                for column in n.timestamps:
+                                    drawMap(n, column, **plotoptions)
 
-        elif request.inputs['summarise'][0].data == 'month':
-            for month in range(1, 13):
-                s.sumMonth(str(month))
-                if len(s.files) == 0:
-                    LOGGER.debug("No files found for month %s" % month)
-                    continue
-                plotoptions['caption'] = "{} {} {} {}: {} {} sum (UTC)".format(s.runname, s.averaging, s.altitude,
-                                                                         s.direction, s.year,
-                                                                         calendar.month_name[month])
-                plotoptions['outfile'] = "{}_{}_{}_monthly.png".format(s.runname, s.year, month)
-                drawMap(s, 'total', **plotoptions)
-
-        elif request.inputs['summarise'][0].data == 'all':
-            s.sumAll()
-
-            plotoptions['caption'] = "{} {} {} {}: Summed (UTC)".format(s.runname, s.averaging, s.altitude, s.direction)
-            plotoptions['outfile'] = "{}_summed_all.png".format(s.runname)
-            drawMap(s, 'total', **plotoptions)
-        else:
-            for filename in os.listdir(os.path.join(rundir, 'outputs')):
-                if '_group' in filename and filename.endswith('.txt'):
-                    if request.inputs['summarise'][0].data == 'day':
-                        s = Sum(os.path.join(rundir, 'outputs'))
-                        date = util.shortname(filename)
-                        s.sumDay(date)
-                        plotoptions['caption'] = "{} {} {} {}: {}{}{} day sum (UTC)".format(s.runname, s.averaging,
-                                                                                      s.altitude, s.direction,
-                                                                                      s.year, s.month, s.day)
-                        plotoptions['outfile'] = "{}_{}{}{}_daily.png".format(s.runname, s.year, s.month, s.day)
-                        drawMap(s, 'total', **plotoptions)
-                    elif request.inputs['summarise'][0].data == 'NA':
-                        n = Name(os.path.join(rundir, 'outputs', filename))
-                        if 'timestamp' in request.inputs:
-                            timestamp = datetime.strftime(request.inputs['timestamp'][0].data, "%d/%m/%Y %H:%M UTC")
-                            LOGGER.debug("Reformatted time: %s" % timestamp)
-                            if timestamp in n.timestamps:
-                                drawMap(n, timestamp, **plotoptions)
-                                break
-                        else:
-                            for column in n.timestamps:
-                                drawMap(n, column, **plotoptions)
+            # Finished plotting so will now delete temp directory
+            shutil.rmtree(tmpdir)
+            # Update status
+            response.update_status("Plotted group %s".format(groupnum), 10+(groupnum/ngroups*85))
 
         # Outputting different response based on the number of plots generated
+        response.update_status("Formatting output", 95)
         if not os.path.exists(plotoptions['outdir']):
             LOGGER.debug("Did not create any plots")
             response.outputs['FileContents'].data_format = FORMATS.TEXT
