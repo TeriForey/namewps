@@ -82,7 +82,7 @@ class PlotAll(Process):
 
         # Parse input params into plot options
         plotoptions = {}
-        plotoptions['outdir'] = os.path.join(rundir, "plots")
+        plotoptions['outdir'] = os.path.join(rundir, "plots_{}".format(datetime.strftime(datetime.now(), "%s")))
         for p in request.inputs:
             if p == "timestamp" or p == "filelocation" or p == "summarise":
                 continue
@@ -172,7 +172,7 @@ class PlotAll(Process):
                 response.outputs['FileContents'].file = os.path.join(plotoptions['outdir'],
                                                                      os.listdir(plotoptions['outdir'])[0])
             else:
-                zippedfile = "plots"
+                zippedfile = "{}_plots".format(request.inputs['filelocation'][0].data)
                 shutil.make_archive(zippedfile, 'zip', plotoptions['outdir'])
                 LOGGER.debug("Zipped file: %s (%s bytes)" % (zippedfile+'.zip', os.path.getsize(zippedfile+'.zip')))
                 response.outputs['FileContents'].data_format = FORMATS.SHP
