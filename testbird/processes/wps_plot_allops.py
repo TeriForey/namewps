@@ -109,7 +109,7 @@ class PlotAll(Process):
 
         LOGGER.debug("Plot options: %s" % plotoptions)
 
-        response.update_status("Processed plot parameters", 10)
+        response.update_status("Processed plot parameters", 5)
 
         # We need to find all the groups and loop through them one at a time!
         groups = {}
@@ -127,6 +127,8 @@ class PlotAll(Process):
                 shutil.copy(os.path.join(rundir, 'outputs', filename), groups[groupnum])
 
         ngroups = len(groups)
+
+        response.update_status("Plotting", 10)
 
         for groupnum, tmpdir in sorted(groups.items()):
             if request.inputs['summarise'][0].data != 'NA':
@@ -192,7 +194,7 @@ class PlotAll(Process):
             # Finished plotting so will now delete temp directory
             shutil.rmtree(tmpdir)
             # Update status
-            response.update_status("Plotted group %s".format(groupnum), 10+(groupnum/ngroups*85))
+            response.update_status("Plotted group {}".format(groupnum), 10+(groupnum/float(ngroups)*85))
 
         # Outputting different response based on the number of plots generated
         response.update_status("Formatting output", 95)
