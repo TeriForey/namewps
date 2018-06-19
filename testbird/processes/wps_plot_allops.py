@@ -113,7 +113,7 @@ class PlotAll(Process):
                 if len(s.files) == 0:
                     LOGGER.debug("No files found for week %s" % week)
                     continue
-                plotoptions['caption'] = "{} {} {} {}: {} week {} sum".format(s.runname, s.averaging, s.altitude,
+                plotoptions['caption'] = "{} {} {} {}: {} week {} sum (UTC)".format(s.runname, s.averaging, s.altitude,
                                                                               s.direction, s.year, week)
                 plotoptions['outfile'] = "{}_{}_{}_weekly.png".format(s.runname, s.year, week)
                 drawMap(s, 'total', **plotoptions)
@@ -124,7 +124,7 @@ class PlotAll(Process):
                 if len(s.files) == 0:
                     LOGGER.debug("No files found for month %s" % month)
                     continue
-                plotoptions['caption'] = "{} {} {} {}: {} {} sum".format(s.runname, s.averaging, s.altitude,
+                plotoptions['caption'] = "{} {} {} {}: {} {} sum (UTC)".format(s.runname, s.averaging, s.altitude,
                                                                          s.direction, s.year,
                                                                          calendar.month_name[month])
                 plotoptions['outfile'] = "{}_{}_{}_monthly.png".format(s.runname, s.year, month)
@@ -133,7 +133,7 @@ class PlotAll(Process):
         elif request.inputs['summarise'][0].data == 'all':
             s.sumAll()
 
-            plotoptions['caption'] = "{} {} {} {}: Summed".format(s.runname, s.averaging, s.altitude, s.direction)
+            plotoptions['caption'] = "{} {} {} {}: Summed (UTC)".format(s.runname, s.averaging, s.altitude, s.direction)
             plotoptions['outfile'] = "{}_summed_all.png".format(s.runname)
             drawMap(s, 'total', **plotoptions)
         else:
@@ -143,7 +143,7 @@ class PlotAll(Process):
                         s = Sum(os.path.join(rundir, 'outputs'))
                         date = util.shortname(filename)
                         s.sumDay(date)
-                        plotoptions['caption'] = "{} {} {} {}: {}{}{} day sum".format(s.runname, s.averaging,
+                        plotoptions['caption'] = "{} {} {} {}: {}{}{} day sum (UTC)".format(s.runname, s.averaging,
                                                                                       s.altitude, s.direction,
                                                                                       s.year, s.month, s.day)
                         plotoptions['outfile'] = "{}_{}{}{}_daily.png".format(s.runname, s.year, s.month, s.day)
