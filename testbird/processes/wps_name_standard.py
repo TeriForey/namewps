@@ -43,17 +43,17 @@ class RunNAMEstandard(Process):
             LiteralInput('time', 'Run Time', data_type='integer',
                          abstract = 'Number of days model will run over',
                          allowed_values=[1,5,10,12], default=1, min_occurs=0),
-            LiteralInput('elevationOut', 'Output elevation averaging ranges', data_type='string',
+            LiteralInput('elevationOut', 'Output elevation averaging range(s)', data_type='string',
                          abstract='Elevation range where the particle number is counted (m agl)'
                                   " Example: 0-100",
                          default='0-100', min_occurs=1, max_occurs=4), # I want ranges, so going to use string format then process the results.
             LiteralInput('resolution','Resolution', data_type='float',
                          abstract='degrees, note the UM global Met data was only 17Km resolution',
                          allowed_values=[0.05,0.25], default=0.25, min_occurs=0),
-            LiteralInput('startdate', 'Start date of runs', data_type='date',
-                         abstract='start date of runs (YYYY-MM-DD)'),
-            LiteralInput('enddate', 'End date of runs', data_type='date',
-                         abstract = 'end date of runs (YYYY-MM-DD)')
+            LiteralInput('startdate', 'Start date', data_type='date',
+                         abstract='UTC start date of runs (YYYY-MM-DD)'),
+            LiteralInput('enddate', 'End date', data_type='date',
+                         abstract = 'UTC end date of runs (YYYY-MM-DD)')
             ]
         outputs = [
             LiteralOutput('runid', 'Run ID', data_type='string',

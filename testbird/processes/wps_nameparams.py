@@ -45,13 +45,13 @@ class RunNAME(Process):
             LiteralInput('time', 'Time to run model over', data_type='integer',
                          abstract = '',
                          default=1),
-            LiteralInput('timeFmt','Time format', data_type='string',
-                         abstract='choose whether to measure the above time in hours or days',
+            LiteralInput('timeFmt',' ', data_type='string',
+                         abstract='number of days/hours NAME will run over. Maximum is 20 days.',
                          allowed_values = ['days','hours'], default='days'),
             BoundingBoxInput('domain', 'Computational Domain', crss=['epsg:4326'],
                              abstract='Coordinates to run NAME within',
                              min_occurs=1),
-            LiteralInput('elevationOut', 'Output elevation averaging ranges', data_type='string',
+            LiteralInput('elevationOut', 'Output elevation averaging range(s)', data_type='string',
                          abstract='Elevation range where the particle number is counted (m agl)'
                                   " Example: 0-100",
                          default='0-100', min_occurs=1, max_occurs=4),
@@ -68,9 +68,9 @@ class RunNAME(Process):
                          abstract='if running daily, over how many hours will it release?',
                          allowed_values=[1, 3, 6, 12, 24], min_occurs=0),
             LiteralInput('startdate', 'Start date', data_type='date',
-                         abstract='start date of runs'),
+                         abstract='UTC start date of runs'),
             LiteralInput('enddate', 'End date', data_type='date',
-                         abstract = 'end date of runs (inclusive)'),
+                         abstract = 'UTC end date of runs (inclusive)'),
             ]
         outputs = [
             LiteralOutput('runid', 'Run ID', data_type='string',
