@@ -1,4 +1,4 @@
-testbird
+NAME-WPS
 ===============================
 
 .. image:: https://img.shields.io/badge/docs-latest-brightgreen.svg
@@ -18,13 +18,13 @@ testbird
     :alt: Join the chat at https://gitter.im/bird-house/birdhouse
 
 
-testbird (the bird)
-  *testbird is a bird ...*
+namewps (the bird)
+  *namewps is a bird ...*
 
-Testing how to build a bird
+A Web Processing Service to run the Met Office model NAME
 
 * Free software: GNU General Public License v3
-* Documentation: https://testbird.readthedocs.io.
+* Documentation: https://namewps.readthedocs.io.
 
 Credits
 -------

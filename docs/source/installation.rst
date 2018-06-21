@@ -6,7 +6,7 @@ Installation
 The installation is using the Python distribution system `Anaconda`_ to maintain software dependencies.
 Anaconda will be installed during the installation process in your home directory ``~/anaconda``.
 
-The installation process setups a conda environment named ``testbird`` with all dependent conda (and pip) packages.
+The installation process setups a conda environment named ``namewps`` with all dependent conda (and pip) packages.
 The installation folder (for configuration files etc) is by default ``~/birdhouse``.
 Configuration options can be overriden in the buildout ``custom.cfg`` file. The ``ANACONDA_HOME`` and ``CONDA_ENVS_DIR`` locations
 can be changed in the ``Makefile.config`` file.
@@ -29,14 +29,14 @@ After successful installation you need to start the services:
    $ make start  # starts supervisor services
    $ make status # shows supervisor status
 
-The depolyed WPS service is by default available on http://localhost:5000/wps?service=WPS&version=1.0.0&request=GetCapabilities.
+The deployed WPS service is by default available on http://localhost:5000/wps?service=WPS&version=1.0.0&request=GetCapabilities.
 
 Check the log files for errors:
 
 .. code-block:: sh
 
-   $ tail -f  ~/birdhouse/var/log/pywps/testbird.log
-   $ tail -f  ~/birdhouse/var/log/supervisor/testbird.log
+   $ tail -f  ~/birdhouse/var/log/pywps/namewps.log
+   $ tail -f  ~/birdhouse/var/log/supervisor/namewps.log
 
 You will find more information about the installation in the `Makefile documentation <http://birdhousebuilderbootstrap.readthedocs.io/en/latest/>`_.
 
@@ -67,7 +67,7 @@ Edit ``custom.cfg``:
     extends = buildout.cfg
 
     [settings]
-    hostname = testbird
+    hostname = namewps
     http-port = 80
     output-port = 8000
     log-level = WARN
@@ -77,7 +77,7 @@ Edit ``custom.cfg``:
     user = www-data
     etc-user = root
 
-Run the installtion and start the services:
+Run the installation and start the services:
 
 .. code-block:: sh
 
