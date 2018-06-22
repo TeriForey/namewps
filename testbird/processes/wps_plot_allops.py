@@ -201,7 +201,7 @@ class PlotAll(Process):
             # Finished plotting so will now delete temp directory
             shutil.rmtree(tmpdir)
             # Update status
-            response.update_status("Plotted group {}".format(groupnum), 10+(groupnum/float(ngroups)*85))
+            response.update_status("Plotted group {}".format(groupnum), 10+((groupnum/float(ngroups))*85))
 
         # Outputting different response based on the number of plots generated
         response.update_status("Formatting output", 95)
