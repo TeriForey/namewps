@@ -6,7 +6,6 @@ extends = buildout.cfg
 # http-port = 5000
 # output-port = 8090
 project = NAME-WPS
-slug = namewps
 abstract = A Web Processing Service to run the Met Office model NAME
 
 ## development options
