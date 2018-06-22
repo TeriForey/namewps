@@ -37,8 +37,8 @@ class PlotAll(Process):
                          abstract="Plot only a specific timestamp. Excludes the creation of summary plots. "
                                   "Format: YYYY-MM-DD HH:MM",
                          min_occurs=0),
-            LiteralInput('station', 'Release location', data_type='string',
-                         abstract='Mark the location of release onto the image. Format: longitude,latitude',
+            LiteralInput('station', 'Mark release location', data_type='boolean',
+                         abstract='Mark the location of release onto the image',
                          min_occurs=0),
             LiteralInput('projection', 'Projection', data_type='string',
                          abstract='Map projection', allowed_values=['cyl', 'npstere', 'spstere'], min_occurs=0),
@@ -91,12 +91,19 @@ class PlotAll(Process):
         for p in request.inputs:
             if p == "timestamp" or p == "filelocation" or p == "summarise":
                 continue
-            if p == 'station' or p == 'lon_bounds' or p == 'lat_bounds' or p == 'scale':
+            if p == 'lon_bounds' or p == 'lat_bounds' or p == 'scale':
                 statcoords = request.inputs[p][0].data.split(',')
                 plotoptions[p] = (statcoords[0].strip(), statcoords[1].strip())
                 if p == 'scale':
                     minscale, maxscale = plotoptions[p]
                     plotoptions[p] = (float(minscale), float(maxscale))
+            if p == "station" and request.inputs[p][0].data == True:
+                with open(os.path.join(rundir, 'user_input_parameters.txt'), 'r') as ins:
+                    inputs = {}
+                    for l in ins:
+                        data = l.split(': ')
+                        inputs[data[0]] = data[1]
+                    plotoptions[p] = (float(inputs['longitude']), float(inputs['latitude']))
             else:
                 plotoptions[p] = request.inputs[p][0].data
 
