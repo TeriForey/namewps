@@ -1,3 +1,4 @@
 pywps>=4.0.0
 werkzeug
 click
+-e git+https://github.com/huard/sphinx-autodoc-pywps.git#egg=sphinx_autodoc_pywps

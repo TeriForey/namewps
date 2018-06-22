@@ -4,6 +4,7 @@
    :maxdepth: 1
    :caption: Contents:
 
+   processes
    installation
    configuration
    changes

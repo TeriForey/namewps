@@ -35,6 +35,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.viewcode',
               'sphinx.ext.napoleon',
+              'sphinx_autodoc_pywps',
               #'pywps.ext_autodoc', # Available on master branch. Will be distributed with the 4.2 release.
               ]
 
