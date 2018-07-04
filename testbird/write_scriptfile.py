@@ -31,7 +31,7 @@ def write_file(params, maxruns):
     lines.append("#BSUB -eo r-%J-%I.err")
     lines.append("#BSUB -W {}".format(walltime))
     lines.append('#BSUB -R "rusage[mem={}]"'.format(mem))
-    lines.append("#BSUB -M {}".format(mem*1000))
+    lines.append("#BSUB -M {}".format(mem))
     lines.append("#BSUB -J {}[1-{}]".format(params['runid'], maxruns))
 
     # Then import system environment
