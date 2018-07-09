@@ -124,7 +124,7 @@ class RunNAMEstandard(Process):
                 params['domain'] = [-10.0, 40.0, 80.0, 180.0]
             elif params['time'] == 5:
                 params['domain'] = [-10.0, 10.0, 90.0, 180.0]
-            elif params['time'] == 10:
+            else:
                 params['domain'] = [-10.0, -60.0, 90.0, 180.0]
         elif params['title'] == 'Halley':
             params['longitude'] = 26.16667
@@ -149,7 +149,7 @@ class RunNAMEstandard(Process):
                 params['domain'] = [-10.0, 40.0, 80.0, 180.0]
             elif params['time'] == 5:
                 params['domain'] = [-10.0, 10.0, 90.0, 180.0]
-            elif params['time'] == 10:
+            else:
                 params['domain'] = [-10.0, -60.0, 90.0, 180.0]
         elif params['title'] == 'BT Tower (150m)':
             params['longitude'] = -0.13888
