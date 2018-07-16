@@ -88,8 +88,8 @@ class RunNAME(Process):
         super(RunNAME, self).__init__(
             self._handler,
             identifier='runname',
-            title='Run NAME-on-JASMIN - Advanced',
-            abstract="Run NAME using advanced settings",
+            title='Run NAME-on-JASMIN',
+            abstract="Run NAME using user-defined settings",
             version='0.1',
             metadata=[
                 Metadata('NAME-on-JASMIN guide', 'http://jasmin.ac.uk/jasmin-users/stories/processing/'),

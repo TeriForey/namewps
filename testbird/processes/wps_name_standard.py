@@ -71,7 +71,7 @@ class RunNAMEstandard(Process):
         super(RunNAMEstandard, self).__init__(
             self._handler,
             identifier='runnamestd',
-            title='Run NAME-on-JASMIN - Standard',
+            title='Run NAME-on-JASMIN - Standard Location',
             abstract="Run NAME 3-hourly from a choice of standard release locations",
             version='0.1',
             metadata=[
