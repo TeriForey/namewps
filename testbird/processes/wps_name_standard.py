@@ -36,6 +36,10 @@ class RunNAMEstandard(Process):
                             'Weybourne',
                             'BT Tower (150m)',
                             'North Kensington',
+                            'Auchencorth Moss',
+                            'Chilbolton Observatory',
+                            'Harwell',
+                            'Mace Head',
                             'Penlee (PML)']),
             LiteralInput('runBackwards', 'Run Backwards', data_type='boolean',
                          abstract = 'Whether to run backwards in time or forwards',
@@ -135,8 +139,9 @@ class RunNAMEstandard(Process):
             params['latitude'] = 52.9503
             params['domain'] = [20.0, -140.0, 90.0, 90.0]
         elif params['title'] == 'North Kensington':
-            params['longitude'] = -0.154988
-            params['latitude'] = 51.522398
+            params['longitude'] = -0.213333338
+            params['latitude'] = 51.52111053
+            params['elevation'] = 5
             params['domain'] = [20.0, -140.0, 90.0, 90.0]
         elif params['title'] == 'Penlee (PML)':
             params['longitude'] = -4.1931
@@ -176,6 +181,26 @@ class RunNAMEstandard(Process):
             params['longitude'] = 105.4902
             params['latitude'] = 21.0024
             params['domain'] = [-45.0, 65.0, 80.0, 195.0]
+        elif params['title'] == 'Auchencorth Moss':
+            params['longitude'] = -3.347222328
+            params['latitude'] = 55.88333511
+            params['elevation'] = 260
+            params['domain'] = [20.0, -140.0, 120.0, 90.0]
+        elif params['title'] == 'Chilbolton Observatory':
+            params['longitude'] = -1.438228000
+            params['latitude'] = 51.14961700
+            params['elevation'] = 78
+            params['domain'] = [20.0, -140.0, 90.0, 90.0]
+        elif params['title'] == 'Harwell':
+            params['longitude'] = -1.326666594
+            params['latitude'] = 51.57110977
+            params['elevation'] = 137
+            params['domain'] = [20.0, -140.0, 90.0, 90.0]
+        elif params['title'] == 'Mace Head':
+            params['longitude'] = -9.938888550
+            params['latitude'] = 53.41388702
+            params['elevation'] = 15
+            params['domain'] = [20.0, -180.0, 90.0, 90.0]
 
         response.update_status("Processed parameters", 5)
 
