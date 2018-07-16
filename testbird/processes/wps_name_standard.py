@@ -185,7 +185,7 @@ class RunNAMEstandard(Process):
             params['longitude'] = -3.347222328
             params['latitude'] = 55.88333511
             params['elevation'] = 260
-            params['domain'] = [20.0, -140.0, 120.0, 90.0]
+            params['domain'] = [20.0, -140.0, 90.0, 90.0]
         elif params['title'] == 'Chilbolton Observatory':
             params['longitude'] = -1.438228000
             params['latitude'] = 51.14961700
