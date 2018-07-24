@@ -89,7 +89,7 @@ class PlotAll(Process):
         inputs = {}
         with open(os.path.join(rundir, 'user_input_parameters.txt'), 'r') as ins:
             for l in ins:
-                data = l.split(': ')
+                data = l.rstrip().split(': ')
                 inputs[data[0]] = data[1]
 
         # Parse input params into plot options
@@ -120,10 +120,10 @@ class PlotAll(Process):
 
         response.update_status("Processed plot parameters", 5)
 
-        tot_plots = get_num_dates(datetime.strptime(inputs['startdate'], "%Y-%m-%d"),
-                                  datetime.strptime(inputs['enddate'], "%Y-%m-%d"),
-                                  request.inputs['summarise'][0].data,
-                                  inputs['timestamp'])
+        tot_plots = get_num_dates(start=datetime.strptime(inputs['startdate'], "%Y-%m-%d"),
+                                  end=datetime.strptime(inputs['enddate'], "%Y-%m-%d"),
+                                  sum=request.inputs['summarise'][0].data,
+                                  type=inputs['timestamp'])
 
         # We need to find all the groups and loop through them one at a time!
         groups = {}
