@@ -91,12 +91,12 @@ class PlotAll(Process):
         for p in request.inputs:
             if p == "timestamp" or p == "filelocation" or p == "summarise":
                 continue
-            elif p == 'lon_bounds' or p == 'lat_bounds' or p == 'scale':
+            elif p == 'lon_bounds' or p == 'lat_bounds':
                 statcoords = request.inputs[p][0].data.split(',')
                 plotoptions[p] = (int(statcoords[0].strip()), int(statcoords[1].strip()))
-                if p == 'scale':
-                    minscale, maxscale = plotoptions[p]
-                    plotoptions[p] = (float(minscale), float(maxscale))
+            elif p == 'scale':
+                statcoords = request.inputs[p][0].data.split(',')
+                plotoptions[p] = (float(statcoords[0].strip()), float(statcoords[1].strip()))
             elif p == "station" and request.inputs[p][0].data == True:
                 with open(os.path.join(rundir, 'user_input_parameters.txt'), 'r') as ins:
                     inputs = {}
