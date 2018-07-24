@@ -13,7 +13,7 @@ import os
 import calendar
 import glob
 import tempfile
-from testbird.utils import getjasminconfigs
+from testbird.utils import getjasminconfigs, get_num_dates
 
 import logging
 LOGGER = logging.getLogger("PYWPS")
@@ -85,6 +85,13 @@ class PlotAll(Process):
         rundir = os.path.join(jasconfigs.get('jasmin', 'outputdir'), request.inputs['filelocation'][0].data)
         LOGGER.debug("Working Directory for plots: %s" % rundir)
 
+        # Parse NAME run input params
+        inputs = {}
+        with open(os.path.join(rundir, 'user_input_parameters.txt'), 'r') as ins:
+            for l in ins:
+                data = l.split(': ')
+                inputs[data[0]] = data[1]
+
         # Parse input params into plot options
         plotoptions = {}
         plotoptions['outdir'] = os.path.join(rundir, "plots_{}".format(datetime.strftime(datetime.now(), "%s")))
@@ -98,12 +105,7 @@ class PlotAll(Process):
                 statcoords = request.inputs[p][0].data.split(',')
                 plotoptions[p] = (float(statcoords[0].strip()), float(statcoords[1].strip()))
             elif p == "station" and request.inputs[p][0].data == True:
-                with open(os.path.join(rundir, 'user_input_parameters.txt'), 'r') as ins:
-                    inputs = {}
-                    for l in ins:
-                        data = l.split(': ')
-                        inputs[data[0]] = data[1]
-                    plotoptions[p] = (float(inputs['longitude']), float(inputs['latitude']))
+                plotoptions[p] = (float(inputs['longitude']), float(inputs['latitude']))
             else:
                 plotoptions[p] = request.inputs[p][0].data
 
@@ -117,6 +119,11 @@ class PlotAll(Process):
         LOGGER.debug("Plot options: %s" % plotoptions)
 
         response.update_status("Processed plot parameters", 5)
+
+        tot_plots = get_num_dates(datetime.strptime(inputs['startdate'], "%Y-%m-%d"),
+                                  datetime.strptime(inputs['enddate'], "%Y-%m-%d"),
+                                  request.inputs['summarise'][0].data,
+                                  inputs['timestamp'])
 
         # We need to find all the groups and loop through them one at a time!
         groups = {}
@@ -134,6 +141,8 @@ class PlotAll(Process):
                 shutil.copy(os.path.join(rundir, 'outputs', filename), groups[groupnum])
 
         ngroups = len(groups)
+        tot_plots = tot_plots * ngroups
+        plots_made = 0
 
         response.update_status("Plotting", 10)
 
@@ -153,6 +162,8 @@ class PlotAll(Process):
                     plotoptions['outfile'] = "{}_{}_{}_{}_weekly.png".format(s.runname, s.altitude.strip('()'),
                                                                              s.year, week)
                     drawMap(s, 'total', **plotoptions)
+                    plots_made += 1
+                    response.update_status("Plotting", 10+int((plots_made/float(tot_plots))*85))
 
             elif request.inputs['summarise'][0].data == 'month':
                 for month in range(1, 13):
@@ -166,6 +177,8 @@ class PlotAll(Process):
                     plotoptions['outfile'] = "{}_{}_{}_{}_monthly.png".format(s.runname, s.altitude.strip('()'),
                                                                               s.year, month)
                     drawMap(s, 'total', **plotoptions)
+                    plots_made += 1
+                    response.update_status("Plotting", 10 + int((plots_made / float(tot_plots)) * 85))
 
             elif request.inputs['summarise'][0].data == 'all':
                 s.sumAll()
@@ -173,6 +186,8 @@ class PlotAll(Process):
                                                                             s.direction)
                 plotoptions['outfile'] = "{}_{}_summed_all.png".format(s.runname, s.altitude.strip('()'))
                 drawMap(s, 'total', **plotoptions)
+                plots_made += 1
+                response.update_status("Plotting", 10 + int((plots_made / float(tot_plots)) * 85))
             else:
                 for filename in os.listdir(tmpdir):
                     if '_group' in filename and filename.endswith('.txt'):
@@ -186,6 +201,8 @@ class PlotAll(Process):
                             plotoptions['outfile'] = "{}_{}_{}{}{}_daily.png".format(s.runname, s.altitude.strip('()'),
                                                                                      s.year, s.month, s.day)
                             drawMap(s, 'total', **plotoptions)
+                            plots_made += 1
+                            response.update_status("Plotting", 10 + int((plots_made / float(tot_plots)) * 85))
                         elif request.inputs['summarise'][0].data == 'NA':
                             n = Name(os.path.join(tmpdir, filename))
                             if 'timestamp' in request.inputs:
@@ -193,16 +210,17 @@ class PlotAll(Process):
                                 LOGGER.debug("Reformatted time: %s" % timestamp)
                                 if timestamp in n.timestamps:
                                     drawMap(n, timestamp, **plotoptions)
+                                    plots_made += 1
+                                    response.update_status("Plotting", 10 + int((plots_made / float(tot_plots)) * 85))
                                     break
                             else:
                                 for column in n.timestamps:
                                     drawMap(n, column, **plotoptions)
+                                    plots_made += 1
+                                    response.update_status("Plotting", 10 + int((plots_made / float(tot_plots)) * 85))
 
             # Finished plotting so will now delete temp directory
             shutil.rmtree(tmpdir)
-            # Update status
-            perdone = (groupnum/float(ngroups))*85
-            response.update_status("Plotted group {}".format(groupnum), 10+int(perdone))
 
         # Outputting different response based on the number of plots generated
         response.update_status("Formatting output", 95)

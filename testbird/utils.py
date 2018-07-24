@@ -107,3 +107,20 @@ def estimatereq(time):
         return 'short-serial', '04:00', 32000
     else:
         return 'high-mem', '08:00', 90000
+
+
+def get_num_dates(start, end, sum, type='3-hourly'):
+    if sum == 'all':
+        return 1
+    elif sum == 'NA':
+        if type == '3-hourly':
+            return get_num_dates(start, end, 'day')*8
+        else:
+            return get_num_dates(start, end, 'day')
+    elif sum == 'day':
+        diff = (end+timedelta(days=1))-start
+        return diff.days
+    elif sum == 'month':
+        return len(range(start.month, (end.year - start.year) * 12 + end.month + 1))
+    elif sum == 'week':
+        return len(range(start.isocalendar()[1], (end.year - start.year) * 52 + end.isocalendar()[1] + 1))
