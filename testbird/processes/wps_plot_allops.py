@@ -146,6 +146,8 @@ class PlotAll(Process):
 
         response.update_status("Plotting", 10)
 
+        oldper = 10
+
         for groupnum, tmpdir in sorted(groups.items()):
             if request.inputs['summarise'][0].data != 'NA':
                 s = Sum(tmpdir)
@@ -161,9 +163,16 @@ class PlotAll(Process):
                                                                                         s.year, week)
                     plotoptions['outfile'] = "{}_{}_{}_{}_weekly.png".format(s.runname, s.altitude.strip('()'),
                                                                              s.year, week)
-                    drawMap(s, 'total', **plotoptions)
+                    try:
+                        drawMap(s, 'total', **plotoptions)
+                        LOGGER.debug("Plotted %s" % plotoptions['outfile'])
+                    except:
+                        LOGGER.error("Failed to plot %s" % plotoptions['outfile'])
                     plots_made += 1
-                    response.update_status("Plotting", 10+int((plots_made/float(tot_plots))*85))
+                    newper = 10+int((plots_made/float(tot_plots))*85)
+                    if oldper != newper:
+                        response.update_status("Plotting", newper)
+                        oldper = newper
 
             elif request.inputs['summarise'][0].data == 'month':
                 for month in range(1, 13):
@@ -176,18 +185,32 @@ class PlotAll(Process):
                                                                              calendar.month_name[month])
                     plotoptions['outfile'] = "{}_{}_{}_{}_monthly.png".format(s.runname, s.altitude.strip('()'),
                                                                               s.year, month)
-                    drawMap(s, 'total', **plotoptions)
+                    try:
+                        drawMap(s, 'total', **plotoptions)
+                        LOGGER.debug("Plotted %s" % plotoptions['outfile'])
+                    except:
+                        LOGGER.error("Failed to plot %s" % plotoptions['outfile'])
                     plots_made += 1
-                    response.update_status("Plotting", 10 + int((plots_made / float(tot_plots)) * 85))
+                    newper = 10 + int((plots_made / float(tot_plots)) * 85)
+                    if oldper != newper:
+                        response.update_status("Plotting", newper)
+                        oldper = newper
 
             elif request.inputs['summarise'][0].data == 'all':
                 s.sumAll()
                 plotoptions['caption'] = "{} {} {} {}: Summed (UTC)".format(s.runname, s.averaging, s.altitude,
                                                                             s.direction)
                 plotoptions['outfile'] = "{}_{}_summed_all.png".format(s.runname, s.altitude.strip('()'))
-                drawMap(s, 'total', **plotoptions)
+                try:
+                    drawMap(s, 'total', **plotoptions)
+                    LOGGER.debug("Plotted %s" % plotoptions['outfile'])
+                except:
+                    LOGGER.error("Failed to plot %s" % plotoptions['outfile'])
                 plots_made += 1
-                response.update_status("Plotting", 10 + int((plots_made / float(tot_plots)) * 85))
+                newper = 10 + int((plots_made / float(tot_plots)) * 85)
+                if oldper != newper:
+                    response.update_status("Plotting", newper)
+                    oldper = newper
             else:
                 for filename in os.listdir(tmpdir):
                     if '_group' in filename and filename.endswith('.txt'):
@@ -200,24 +223,45 @@ class PlotAll(Process):
                                                                                           s.year, s.month, s.day)
                             plotoptions['outfile'] = "{}_{}_{}{}{}_daily.png".format(s.runname, s.altitude.strip('()'),
                                                                                      s.year, s.month, s.day)
-                            drawMap(s, 'total', **plotoptions)
+                            try:
+                                drawMap(s, 'total', **plotoptions)
+                                LOGGER.debug("Plotted %s" % plotoptions['outfile'])
+                            except:
+                                LOGGER.error("Failed to plot %s" % plotoptions['outfile'])
                             plots_made += 1
-                            response.update_status("Plotting", 10 + int((plots_made / float(tot_plots)) * 85))
+                            newper = 10 + int((plots_made / float(tot_plots)) * 85)
+                            if oldper != newper:
+                                response.update_status("Plotting", newper)
+                                oldper = newper
                         elif request.inputs['summarise'][0].data == 'NA':
                             n = Name(os.path.join(tmpdir, filename))
                             if 'timestamp' in request.inputs:
                                 timestamp = datetime.strftime(request.inputs['timestamp'][0].data, "%d/%m/%Y %H:%M UTC")
                                 LOGGER.debug("Reformatted time: %s" % timestamp)
                                 if timestamp in n.timestamps:
-                                    drawMap(n, timestamp, **plotoptions)
+                                    try:
+                                        drawMap(n, timestamp, **plotoptions)
+                                        LOGGER.debug("Plotted %s" % timestamp)
+                                    except:
+                                        LOGGER.error("Failed to plot %s" % timestamp)
                                     plots_made += 1
-                                    response.update_status("Plotting", 10 + int((plots_made / float(tot_plots)) * 85))
+                                    newper = 10 + int((plots_made / float(tot_plots)) * 85)
+                                    if oldper != newper:
+                                        response.update_status("Plotting", newper)
+                                        oldper = newper
                                     break
                             else:
                                 for column in n.timestamps:
-                                    drawMap(n, column, **plotoptions)
+                                    try:
+                                        drawMap(n, column, **plotoptions)
+                                        LOGGER.debug("Plotted %s" % column)
+                                    except:
+                                        LOGGER.error("Failed to plot %s" % column)
                                     plots_made += 1
-                                    response.update_status("Plotting", 10 + int((plots_made / float(tot_plots)) * 85))
+                                    newper = 10 + int((plots_made / float(tot_plots)) * 85)
+                                    if oldper != newper:
+                                        response.update_status("Plotting", newper)
+                                        oldper = newper
 
             # Finished plotting so will now delete temp directory
             shutil.rmtree(tmpdir)
