@@ -149,6 +149,7 @@ class PlotAll(Process):
         oldper = 10
 
         for groupnum, tmpdir in sorted(groups.items()):
+            LOGGER.debug("Working on group %s in folder %s" % (groupnum, tmpdir))
             if request.inputs['summarise'][0].data != 'NA':
                 s = Sum(tmpdir)
 
@@ -213,6 +214,7 @@ class PlotAll(Process):
                     oldper = newper
             else:
                 for filename in os.listdir(tmpdir):
+                    LOGGER.debug("Looking at file %s" % filename)
                     if '_group' in filename and filename.endswith('.txt'):
                         if request.inputs['summarise'][0].data == 'day':
                             #s = Sum(tmpdir)
@@ -252,11 +254,12 @@ class PlotAll(Process):
                                     break
                             else:
                                 for column in n.timestamps:
+                                    LOGGER.debug("Starting to plot %s" % column)
                                     try:
                                         drawMap(n, column, **plotoptions)
                                         LOGGER.debug("Plotted %s" % column)
                                     except:
-                                        LOGGER.error("Failed to plot %s" % column)
+                                        LOGGER.debug("Failed to plot %s" % column)
                                     plots_made += 1
                                     newper = 10 + int((plots_made / float(tot_plots)) * 85)
                                     if oldper != newper:
